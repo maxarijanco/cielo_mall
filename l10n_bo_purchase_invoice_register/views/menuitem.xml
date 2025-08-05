@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+            <menuitem
+                id="purchase_packages_menu"
+                name="Paquetes (COMPRAS)"
+                parent="l10n_bo_bolivian_invoice.my_company_dates"
+                sequence="7"
+                action="action_l10n_bo_acoim_purchase_invoice_act_window"
+                />
+        
+            
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="view_l10n_bo_bolivian_invoice_l10n_invoice_document" model="ir.ui.view">
+            <field name="name">l10n_bo_bolivian_invoice.l10n_invoice_document</field>
+            <field name="inherit_id" ref="l10n_bo_bolivian_invoice.l10n_invoice_document" />
+            <field name="arch" type="xml">
+                <xpath expr="//div/t" position="before">
+                    <t t-if="o.document_type_id.getCode() == 2">
+                        <t t-call="l10n_bo_rent.l10n_bo_rent_template" />
+                    </t>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

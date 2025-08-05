@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <template id="l10n_bo_acoim_voucher_external_layout">
+            <t t-if="not o" t-set="o" t-value="doc" />
+            <t t-if="not company">
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id" />
+                </t>
+                <t t-elif="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id.sudo()" />
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company" />
+                </t>
+            </t>
+            <t t-call="l10n_bo_acoim_voucher.l10n_bo_acoim_voucher_custom_external_layout">
+                <t t-raw="0" />
+            </t>
+        </template>
+
+        <template id="l10n_bo_acoim_voucher_custom_external_layout">
+            <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+                <div style="font-size: 15px;" >
+
+
+                    <table border="1" style="width:100%; border: 1px solid white;" class="default">
+                            
+                        <t t-set="local_currency" t-value="o.company_id.currency_id.id == o.currency_id.id"/>
+                        
+                        <tr>
+                            <td style="width: 20%;" ><strong>COMPAÑIA:</strong></td>
+                            <td><span style="font-family: Arial, sans-serif;"  t-field="o.company_id.name" /></td>
+                        </tr>
+                        <tr>
+                            <td><b>NIT:</b></td>
+                            <td> <span style="font-family: Arial, sans-serif;" t-field="o.company_id.vat" /></td>
+                        </tr>
+                        <tr>
+                            <td><b>DIRECCIÓN:</b></td>
+                            <td> <span style="font-family: Arial, sans-serif;" t-field="o.company_id.street" /></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" style="text-align: center; font-size:20px; padding:9px;" > <span  t-field="o.journal_id.name" /></td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="2" style="border: 1px solid black;" >
+                                <table border="1" style="width:100%; border: 1px solid white;" class="default">
+                                    <tr>
+                                        <td style="width:15%;" ><b>Empresa:</b></td>
+                                        <td style="width:60%;" ><span style="font-family: Arial, sans-serif;" t-field="o.partner_id.name" /></td>
+                                        <td style="width:6%;" ><b>Nro:</b></td>
+                                        <td><span style="font-family: Arial, sans-serif;" t-field="o.name" /></td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td><b>Referencia:</b></td>
+                                        <td><span style="font-family: Arial, sans-serif;" t-field="o.ref" /></td>
+                                        <td>Fecha</td>
+                                        <td>
+                                            <t t-if="o.move_type == 'entry'">
+                                                <span style="font-family: Arial, sans-serif;" t-esc="o.date"/>
+                                            </t>
+
+                                            <t t-else="else">
+                                                <span style="font-family: Arial, sans-serif;" t-esc="o.invoice_date"/>
+                                            </t>
+                                            
+                                        </td>
+                                        
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td><b>Moneda:</b></td>
+                                        <td><span style="font-family: Arial, sans-serif;" t-field="o.currency_id.name" /></td>
+                                        <t t-if='not local_currency' >
+                                            <td>T.C.</td>
+                                            <td><span style="font-family: Arial, sans-serif;" t-esc="o.currency_id.inverse_rate" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/></td>
+                                            
+                                        </t>
+                                        <t t-else="else" >
+                                            <td></td>
+                                            <td></td>
+                                        </t>
+                                        
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+                
+            </div>
+        
+            <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-call="web.address_layout" />
+                <t t-raw="0" />
+            </div>
+            <div class="footer">
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <table style="text-align: center; font-size: 12px;  width: 100%; padding-top: 30mm; border-bottom: 0; border: 1px solid white;" >
+                            <td style="padding-left: 10px; padding-right: 10px; width: 200px; margin-top:0px; padding-top:0px; margin:0px;">
+                                <hr style="height: 1px; background: black; margin-top:0px; padding-top:0px; margin:0px;"/>
+                                Gerente General
+                            </td>
+                            <td style="padding-left: 20px; padding-right: 40px; width: 200px; margin-top:0; padding-top:0; margin:0;">
+                                <hr style="height: 1px; background: black; margin-top:0px; padding-top:0px; margin:0px;"/>
+                                Contador
+                            </td>
+                            <td style="padding-left: 1px; padding-right: 20px; width: 200px; margin-top:0; padding-top:0; margin:0;">
+                                <hr style="height: 1px; background: black; margin-top:0px; padding-top:0px; margin:0px; "/>
+                                Interesado
+                            </td>
+                </table>
+                <br/>
+                <br/>
+                <br/>
+                
+
+                    <div style="font-size: 12px; border-top: 2px solid black;">
+                       <table border="1" style="width:100%; border: 1px solid white;" class="default">
+                            <tr>
+                                <td style="text-align: left;  width: 33%;">
+                                    Fecha y hora: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M')" />
+                                </td>
+                                <td style="text-align: center; width: 33%;">
+                                    Usuario: <span t-esc="o.env.user.name"/>
+                                </td>
+                                <td style="text-align: right; width: 33%;">
+                                    <span class="page" />/
+                                    <span class="topage" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                
+            </div>
+        </template>
+
+    </data>
+</odoo>

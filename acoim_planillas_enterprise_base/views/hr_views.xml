@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Agregar el menú RRHH -->
+    <menuitem
+        id="menu_hr_payroll_rrhh_root"
+        name="RRHH"
+        parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"
+        sequence="50"
+        groups="hr_payroll.group_hr_payroll_user"/>
+
+    <!-- Heredar y actualizar la vista del formulario de empleados -->
+    <record id="acoim_view_employee_form_form_inherit" model="ir.ui.view">
+        <field name="name">acoim.view.hr.employee.form.inherit</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Insertar después del título -->
+            <xpath expr="//header" position="inside">
+                <div>
+                    <label for="doble_nombre">Doble Nombre:</label>
+                    <h1>
+                        <field name="doble_nombre"/>
+                    </h1>
+                </div>
+            </xpath>
+            <!-- Insertar después del campo department_id -->
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="codigo_rc_iva"/>
+                <field name="tipo"/>
+                <field name="novedades"/>
+                <field name="jubilado"/>
+                <field name="aporte_afp"/>
+            </xpath>
+            <!-- Insertar después del campo pin en la pestaña de configuración -->
+            <xpath expr="//page[@name='hr_settings']//group//field[@name='pin']" position="after">
+                <field name="codigo_css"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

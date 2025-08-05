@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="view_l10n_bo_acoim_purchase_invoice_account_move_tree" model="ir.ui.view">
+            <field name="name">view_l10n_bo_acoim_purchase_invoice_account_move_tree</field>
+            <field name="model">account.move</field>
+            <field name="priority" eval="18"/>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+                
+                
+                <xpath expr="//field[@name='ref']" position="before">
+                    <field name="invoice_number" column_invisible="context.get('default_move_type') not in ('in_invoice')" />                    
+                </xpath>
+                
+                
+            </field>
+        </record>
+
+        <record id="view_l10n_bo_acoim_purchase_invoice_account_move_form" model="ir.ui.view">
+            <field name="name">view_l10n_bo_acoim_purchase_invoice_account_move_form</field>
+            <field name="model">account.move</field>
+            <field name="priority" eval="18"/>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='partner_shipping_id']" position="after">
+                    <field name="bo_purchase_edi" invisible="1" />      
+                              
+                </xpath>
+
+                <!-- <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/label[@for='invoice_date'][2]" position="attributes">
+                    <attribute name="invisible">move_type not in ['in_invoice', 'in_refund', 'in_receipt'] or bo_purchase_edi</attribute>
+                </xpath> -->
+                
+                <!-- <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='invoice_date']" position="attributes">
+                    <attribute name="invisible">move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'] or edi_bo_invoice or bo_purchase_edi</attribute>
+                
+                </xpath> -->
+                
+
+                
+                <!-- <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='invoice_date']" position="after">
+                    <field name="invoice_date_purchase_edi" invisible="not bo_purchase_edi" required="bo_purchase_edi" readonly="state != 'draft'" />                    
+                </xpath> -->
+                
+
+                <xpath expr="//field[@name='partner_shipping_id']" position="before">
+                    <field name="purchase_type" readonly="state !='draft'" invisible="not bo_purchase_edi"  />
+                </xpath>
+
+                
+                <xpath expr="//field[@name='invoice_outstanding_credits_debits_widget']" position="before">
+                    <field name="is_dui_dim" invisible='1' />
+                    <span invisible='not is_dui_dim' colspan="2"  style="color:red;" >Total = RC IVA Importaciones (DUI/DIM)</span>
+                </xpath>
+                
+                
+                
+                <xpath expr="//page[last()]" position="after">
+                    <page string="Factura compra (BO)" invisible="not bo_purchase_edi" readonly="state != 'draft'" >
+                        <group>
+                            <group>
+                                <field name="origin_invoice_type" required="bo_purchase_edi and state == 'draft'" />
+                                
+                                
+                                <field name="reazon_social" required='bo_purchase_edi' />
+                                <field name="nit_ci" required='bo_purchase_edi' />
+                                
+                                <field name="invoice_number" readonly="bo_purchase_edi and origin_invoice_type == 'international'" />
+                                <field name="cuf" required="bo_purchase_edi" readonly="bo_purchase_edi and origin_invoice_type in ['international', 'ticket']" />
+                                
+                            </group>
+                            
+                            <group>
+                                <field name="purchase_control_code"/>
+                                <field name="dui_dim_number" placeholder='Ej.: 20215212014770'  required="bo_purchase_edi and state == 'draft' and origin_invoice_type == 'international'" readonly="bo_purchase_edi and origin_invoice_type != 'international'"/>
+                            </group>
+                            
+                        </group>
+                    </page>
+                </xpath>
+                
+                
+            </field>
+        </record>
+    </data>
+</odoo>

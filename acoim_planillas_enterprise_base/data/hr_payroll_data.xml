@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="hr_dias_trabajados_comp_rule" model="ir.rule">
+            <field name="name">hr bono</field>
+            <field name="model_id" ref="model_hr_dias_trabajados"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('compania', 'in', company_ids)]</field>
+        </record>
+        <record id="hr_bono_comp_rule" model="ir.rule">
+            <field name="name">hr bono</field>
+            <field name="model_id" ref="model_hr_bono"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="hr_planilla_comp_rule" model="ir.rule">
+            <field name="name">hr bono</field>
+            <field name="model_id" ref="model_hr_planilla"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('compania', 'in', company_ids)]</field>
+        </record>
+        <record id="hr_planilla_iva_comp_rule" model="ir.rule">
+            <field name="name">hr bono</field>
+            <field name="model_id" ref="model_hr_planilla_iva"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('compania', 'in', company_ids)]</field>
+        </record>
+        <record id="hr_asignacion_horas_extra_comp_rule" model="ir.rule">
+            <field name="name">hr asignacion horas extra</field>
+            <field name="model_id" ref="model_hr_asignacion_horas_extra"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_asignacion_facturas_presentadas_comp_rule" model="ir.rule">
+            <field name="name">hr asignacion facturas presentadas</field>
+            <field name="model_id" ref="model_hr_asignacion_facturas_presentadas"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="hr_asignacion_saldo_favor_dependiente_comp_rule" model="ir.rule">
+            <field name="name">Asignacion saldo favor dependiente</field>
+            <field name="model_id" ref="model_hr_asignacion_saldo_favor_dependiente"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+        
+
+        <record id="RETROACT" model="hr.salary.rule.category">
+            <field name="name">Retroactivos</field>
+            <field name="code">RETROACTIVO</field>
+        </record>
+
+        <record id="BANTI" model="hr.salary.rule.category">
+            <field name="name">Bono Antiguedad</field>
+            <field name="code">BANTI</field>
+        </record>
+
+        <record id="BONO" model="hr.salary.rule.category">
+            <field name="name">Bonos</field>
+            <field name="code">BONO</field>
+        </record>
+
+         <record id="HEXTR" model="hr.salary.rule.category">
+            <field name="name">Horas extraordinarias</field>
+            <field name="code">HEXTR</field>
+        </record>
+
+         <record id="COMP" model="hr.salary.rule.category">
+            <field name="name">Aportes Patronales</field>
+            <field name="code">COMP</field>
+        </record>
+
+         <record id="TDESC" model="hr.salary.rule.category">
+            <field name="name">Total Descuentos</field>
+            <field name="code">TDESC</field>
+        </record>
+
+        <record id="SMN" model="hr.salary.rule.category">
+            <field name="name">Salario Minimo</field>
+            <field name="code">SMN</field>
+        </record>
+
+        <record id="RCIVA" model="hr.salary.rule.category">
+            <field name="name">RC-IVA</field>
+            <field name="code">RCIVA</field>
+        </record>
+        <record id="tipo_estructura_base" model="hr.payroll.structure.type">
+            <field name="name">Estructura Base TG</field>
+            <field name="country_id" eval="False"/>
+            <field name="wage_type">hourly</field>
+        </record>
+
+        <record id="tipo_estructura_retro" model="hr.payroll.structure.type">
+            <field name="name">Estructura Retroactivos</field>
+            <field name="country_id" eval="False"/>
+            <field name="wage_type">hourly</field>
+        </record>
+
+        <record id="estructura_base" model="hr.payroll.structure">
+            <field name="name">Trabajadores en General (Base)</field>
+            <field name="type_id" ref="tipo_estructura_base"/>
+        </record>
+
+
+        <record id="estructura_base_retro" model="hr.payroll.structure">
+            <field name="name">Retroactivos (Base)</field>
+            <field name="type_id" ref="tipo_estructura_retro"/>
+        </record>
+
+ <!--  -->
+
+        <record id="hr_rule_basic_anteriorretro" model="hr.salary.rule">
+            <field name="name">Basico Anterior (Retroactivo)</field>
+            <field name="sequence" eval="31"/>
+            <field name="code">BASICANTRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (contract.wage/30)*payslip.dias_trabajados</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+        <record id="hr_rule_basic_incremretro" model="hr.salary.rule">
+            <field name="name">Basico Incremento (Retroactivo)</field>
+            <field name="sequence" eval="32"/>
+            <field name="code">BASICINCRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = ((contract.wage/30)*payslip.dias_trabajados)+(((contract.wage/30)*payslip.dias_trabajados)*(payslip.porcentaje/100))</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+        <record id="hr_rule_basic_antiguanter" model="hr.salary.rule">
+            <field name="name">Bono de Antiguedad Anterior (Retroactivo)</field>
+            <field name="sequence" eval="33"/>
+            <field name="code">BANTIANT</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = float((payslip.salario_minimo* 3)*float(payslip.bono_antiguedad/ 100))</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+        <record id="hr_rule_bono_antminimo" model="hr.salary.rule">
+            <field name="name">Bono de Antiguedad Minimo (Retroactivo)</field>
+            <field name="sequence" eval="34"/>
+            <field name="code">BANTIACTMI</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = float((payslip.salario_minimo_act* 3)*float(payslip.bono_antiguedad/ 100))</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_basic_eneroretro" model="hr.salary.rule">
+            <field name="name">Enero (Retroactivo)</field>
+            <field name="sequence" eval="35"/>
+            <field name="code">ENERORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_enero:
+    for pay in payslip.retro_enero:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BASIC':
+                result = (float(slips.amount)*(payslip.porcentaje/100))
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_bonoeneroretro" model="hr.salary.rule">
+            <field name="name">Bono Enero (Retroactivo)</field>
+            <field name="sequence" eval="36"/>
+            <field name="code">BENERORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_enero:
+    for pay in payslip.retro_enero:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BANTI':
+                result = (float((payslip.salario_minimo_act* 3)*float(payslip.bono_antiguedad/ 100)))-float(slips.amount)
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+        <record id="hr_rule_basic_febreroretro" model="hr.salary.rule">
+            <field name="name">Febrero (Retroactivo)</field>
+            <field name="sequence" eval="37"/>
+            <field name="code">FEBRERORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_febrero:
+    for pay in payslip.retro_febrero:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BASIC':
+                result = (float(slips.amount)*(payslip.porcentaje/100))
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_bonofebreroretro" model="hr.salary.rule">
+            <field name="name">Bono Febrero (Retroactivo)</field>
+            <field name="sequence" eval="38"/>
+            <field name="code">BFEBRERORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_febrero:
+    for pay in payslip.retro_febrero:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BANTI':
+                result = (float((payslip.salario_minimo_act* 3)*float(payslip.bono_antiguedad/ 100)))-float(slips.amount)
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+
+        <record id="hr_rule_basic_marzoretro" model="hr.salary.rule">
+            <field name="name">Marzo (Retroactivo)</field>
+            <field name="sequence" eval="39"/>
+            <field name="code">MARZORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_marzo:
+    for pay in payslip.retro_marzo:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BASIC':
+                result = (float(slips.amount)*(payslip.porcentaje/100))
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_bonomarzoretro" model="hr.salary.rule">
+            <field name="name">Bono Marzo (Retroactivo)</field>
+            <field name="sequence" eval="40"/>
+            <field name="code">BMARZORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_marzo:
+    for pay in payslip.retro_marzo:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BANTI':
+                result = (float((payslip.salario_minimo_act* 3)*float(payslip.bono_antiguedad/ 100)))-float(slips.amount)
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_basic_abrilretro" model="hr.salary.rule">
+            <field name="name">Abril (Retroactivo)</field>
+            <field name="sequence" eval="41"/>
+            <field name="code">ABRILRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_abril:
+    for pay in payslip.retro_abril:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BASIC':
+                result = (float(slips.amount)*(payslip.porcentaje/100))
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_bonoabrilretro" model="hr.salary.rule">
+            <field name="name">Bono Abril (Retroactivo)</field>
+            <field name="sequence" eval="42"/>
+            <field name="code">BABRILRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_abril:
+    for pay in payslip.retro_abril:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BANTI':
+                result = (float((payslip.salario_minimo_act* 3)*float(payslip.bono_antiguedad/ 100)))-float(slips.amount)
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_basic_mayoretro" model="hr.salary.rule">
+            <field name="name">Mayo (Retroactivo)</field>
+            <field name="sequence" eval="43"/>
+            <field name="code">MAYORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_mayo:
+    for pay in payslip.retro_mayo:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BASIC':
+                result = (float(slips.amount)*(payslip.porcentaje/100))
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_bonomayoretro" model="hr.salary.rule">
+            <field name="name">Bono Mayo (Retroactivo)</field>
+            <field name="sequence" eval="44"/>
+            <field name="code">BMAYORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if payslip.retro_mayo:
+    for pay in payslip.retro_mayo:
+        total_ganado = 0.00
+        for slips in pay.line_ids:
+            if slips.code == 'BANTI':
+                result = (float((payslip.salario_minimo_act* 3)*float(payslip.bono_antiguedad/ 100)))-float(slips.amount)
+else:
+    result=0
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_totalretro" model="hr.salary.rule">
+            <field name="name">Total Retroactivos (Retroactivo)</field>
+            <field name="sequence" eval="45"/>
+            <field name="code">TOTALRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = ENERORETRO+BENERORETRO+FEBRERORETRO+BFEBRERORETRO+MARZORETRO+BMARZORETRO+ABRILRETRO+BABRILRETRO+MAYORETRO+BMAYORETRO
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+        <record id="hr_rule_afpretro" model="hr.salary.rule">
+            <field name="name">AFP SIP Aporte Laboral (Retroactivo)</field>
+            <field name="sequence" eval="46"/>
+            <field name="code">AFPALRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+
+if (employee.aporte_afp==False) and (payslip.jubilado== False):
+    if (payslip.anios_empleado&lt;=65):
+        result = TOTALRETRO* (12.71/100)
+    else:
+        result = TOTALRETRO* (11/100)
+elif (employee.aporte_afp==True) and (payslip.jubilado== True):
+    if (payslip.anios_empleado&lt;=65):
+        result = TOTALRETRO* (12.71/100)
+    else:
+        result = TOTALRETRO* (11/100)
+elif (employee.aporte_afp==False) and (payslip.jubilado== True):
+    if (payslip.anios_empleado&lt;=65):
+        result = TOTALRETRO* (2.71/100)
+    else:
+        result = TOTALRETRO* (1/100)
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+        <record id="hr_rule_rcivaretro" model="hr.salary.rule">
+            <field name="name">RC-IVA 13% (Retroactivo)</field>
+            <field name="sequence" eval="47"/>
+            <field name="code">RCIVARETROA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result=0</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+        <record id="hr_rule_otrodescuentoretro" model="hr.salary.rule">
+            <field name="name">Otros Descuentos (Retroactivo)</field>
+            <field name="sequence" eval="48"/>
+            <field name="code">DESCUENTRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result=0</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_totaldescuentretro" model="hr.salary.rule">
+            <field name="name">Total Descuentos (Retroactivo)</field>
+            <field name="sequence" eval="49"/>
+            <field name="code">TDESCUENTRETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result=result = AFPALRETRO+RCIVARETROA+DESCUENTRETRO</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+        <record id="hr_rule_netoretro" model="hr.salary.rule">
+            <field name="name">Liquido Pagable (Retroactivo)</field>
+            <field name="sequence" eval="50"/>
+            <field name="code">NETORETRO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RETROACT"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = TOTALRETRO - TDESCUENTRETRO</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base_retro"/>
+        </record>
+
+
+<!--  -->
+        <record id="hr_rule_antiguedad" model="hr.salary.rule">
+            <field name="name">Bono de Antiguedad</field>
+            <field name="sequence" eval="2"/>
+            <field name="code">BANTI</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.BANTI"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = float((payslip.salario_minimo* 3)*float(payslip.bono_antiguedad/ 100))</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_produccion" model="hr.salary.rule">
+            <field name="name">Bono de Producción</field>
+            <field name="sequence" eval="3"/>
+            <field name="code">BONOP</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.BONO"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">fix</field>
+            <field eval="0" name="amount_fix"/>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+         <record id="hr_rule_dominical" model="hr.salary.rule">
+            <field name="name">Bono de Dominical</field>
+            <field name="sequence" eval="4"/>
+            <field name="code">BONOD</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.BONO"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">fix</field>
+            <field eval="0" name="amount_fix"/>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        
+       <record id="hr_rule_horas_extras" model="hr.salary.rule">
+            <field name="name">Horas Extras</field>
+            <field name="sequence" eval="5"/>
+            <field name="code">HEXTR</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.HEXTR"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.horas_extra</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_otros_bonos" model="hr.salary.rule">
+            <field name="name">Otros Bonos</field>
+            <field name="sequence" eval="6"/>
+            <field name="code">OBONO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.BONO"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.total_bonos</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_total_ganado" model="hr.salary.rule">
+            <field name="name">Total Ganado</field>
+            <field name="sequence" eval="11"/>
+            <field name="code">GROSS</field>
+            <field name="category_id" ref="hr_payroll.GROSS"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW'] + categories['BANTI'] + categories['BONO'] + categories['HEXTR']</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_afp_laboral" model="hr.salary.rule">
+            <field name="name">AFP SIP Aporte Laboral</field>
+            <field name="sequence" eval="12"/>
+            <field name="code">AFPAL</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if (employee.aporte_afp==False) and (payslip.jubilado== False):
+    if (payslip.anios_empleado&lt;=65):
+        result = GROSS * (12.71/100)
+    else:
+        result = GROSS * (11/100)
+elif (employee.aporte_afp==True) and (payslip.jubilado== True):
+    if (payslip.anios_empleado&lt;=65):
+        result = GROSS * (12.71/100)
+    else:
+        result = GROSS * (11/100)
+elif (employee.aporte_afp==False) and (payslip.jubilado== True):
+    if (payslip.anios_empleado&lt;=65):
+        result = GROSS * (2.71/100)
+    else:
+        result = GROSS * (1/100)
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        <record id="hr_rule_afp_patronal" model="hr.salary.rule">
+            <field name="name">AFP SIP Aporte Patronal</field>
+            <field name="sequence" eval="13"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">AFPAP</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.COMP"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+if (employee.aporte_afp==False) and (payslip.jubilado== False):
+    if (payslip.anios_empleado&lt;=65):
+        result = GROSS * (6.71/100)
+    else:
+        result = GROSS * (5/100)
+elif (employee.aporte_afp==True) and (payslip.jubilado== True):
+    if (payslip.anios_empleado&lt;=65):
+        result = GROSS * (6.71/100)
+    else:
+        result = GROSS * (5/100)
+elif (employee.aporte_afp==False) and (payslip.jubilado== True):
+    if (payslip.anios_empleado&lt;=65):
+        result = GROSS * (5/100)
+    else:
+        result = GROSS * (5/100)
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        <record id="hr_rule_vacaciones" model="hr.salary.rule">
+            <field name="name">provision Vacaciones</field>
+            <field name="sequence" eval="14"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">VACA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.COMP"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = GROSS * (4.17/100)</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        <record id="hr_rule_afp_nacional" model="hr.salary.rule">
+            <field name="name">AFP SIP Aporte Nacional</field>
+            <field name="sequence" eval="15"/>
+            <field name="appears_on_payslip">True</field>
+            <field name="code">AFPASN</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">total = aporte1 = aporte2 = aporte3 = 0
+if GROSS > 13000:
+    aporte1 += (GROSS-13000)*(0.01)
+if GROSS > 25000:
+    aporte1 += (GROSS-25000)*(0.05)
+if GROSS > 35000:
+    aporte1 += (GROSS-35000)*(0.10) 
+result = aporte1+aporte2+aporte3
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        
+        <record id="hr_rule_sueldo_imponible_rciva" model="hr.salary.rule">
+            <field name="name">Sueldo Imponible RC-IVA (j)</field>
+            <field name="sequence" eval="51"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">SIRCIVA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result =GROSS- (AFPASN+AFPAL)</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        
+        <record id="hr_rule_2salarios_mn" model="hr.salary.rule">
+            <field name="name">2 Salarios Minimos Nacionales (k)</field>
+            <field name="sequence" eval="52"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">DOSSMN</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = float(payslip.salario_minimo * 2)</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>   
+        
+        <record id="hr_rule_importe_imponible_rciva" model="hr.salary.rule">
+            <field name="name">Importe sujeto a impuesto (base imponible) (l)</field>
+            <field name="sequence" eval="53"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">IMSBIM</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">importe_sujeto=0
+if float(SIRCIVA)>float(DOSSMN):
+    importe_sujeto = float(SIRCIVA) - float(DOSSMN)
+else:
+    importe_sujeto = 0 
+result = importe_sujeto</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_impuesto_rciva" model="hr.salary.rule">
+            <field name="name">Impuesto RC-IVA (m)</field>
+            <field name="sequence" eval="54"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">IMPRCIVA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = IMSBIM * 13/100</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_13porciento_s2smn" model="hr.salary.rule">
+            <field name="name">13% de dos (2) Salarios Mínimos Nacionales (n)</field>
+            <field name="sequence" eval="55"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">TRECESDMN</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># Inicializar la variable
+trece_por_ciento_2smn = 0
+
+# Regla condicional 
+if float(IMSBIM) == 0:
+    trece_por_ciento_2smn = 0
+else:
+    trece_por_ciento_2smn = float(DOSSMN) * 0.13
+
+# Asignar el resultado final
+result = trece_por_ciento_2smn</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>        
+
+        <record id="hr_rule_impuesto_neto_rciva" model="hr.salary.rule">
+            <field name="name">Impuesto neto RC-IVA (o)</field>
+            <field name="sequence" eval="56"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">NETORCIVA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">neto_rciva = 0
+if IMPRCIVA>TRECESDMN:
+    neto_rciva = float(IMPRCIVA) - float(TRECESDMN)
+else:
+    neto_rciva = 0
+result = neto_rciva</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_facturas_presentadas" model="hr.salary.rule">
+            <field name="name">F-110 Facturas Presentadas 13% (p)</field>
+            <field name="sequence" eval="57"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">FPRCIVA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.facturas_presentadas</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_saldo_fisco" model="hr.salary.rule">
+            <field name="name">Saldo Favor Fisco (q)</field>
+            <field name="sequence" eval="58"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">SALDOFISCO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">saldo_favor_fisco = 0.00
+if float(NETORCIVA)>float(FPRCIVA):
+    saldo_favor_fisco = float(NETORCIVA)-float(FPRCIVA)
+result= saldo_favor_fisco </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_saldo_dependiente" model="hr.salary.rule">
+            <field name="name">Saldo Favor Dependiente (r)</field>
+            <field name="sequence" eval="59"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">SALDODEPEN</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">FPRCIVA = float(FPRCIVA) if FPRCIVA else 0.00  # Si FPRCIVA es None o vacío, asignar 0.00
+NETORCIVA = float(NETORCIVA) if NETORCIVA else 0.00  # Si NETORCIVA es None o vacío, asignar 0.00
+
+# Inicializar la variable saldo_favor_dependiente
+saldo_favor_dependiente = 0.00
+
+# Si FPRCIVA es mayor que NETORCIVA, entonces saldo_favor_dependiente es la diferencia redondeada a 0 decimales
+if FPRCIVA > NETORCIVA:
+    saldo_favor_dependiente = round(FPRCIVA - NETORCIVA, 0)  # Redondear a 0 decimales
+
+# Asignar el valor calculado a la variable de resultado
+result = saldo_favor_dependiente
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        
+        <record id="hr_rule_periodo_anterior_dep" model="hr.salary.rule">
+            <field name="name">Saldo a favor del dependiente periodo anterior (s)</field>
+            <field name="sequence" eval="60"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">SFDMA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <!-- Definición del código Python para el cálculo en amount_python_compute -->
+            <field name="amount_python_compute">result = 0.0</field>
+               
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_mtto_valor_periodo_anterior" model="hr.salary.rule">
+            <field name="name">Mantenimiento de Valor Saldo a favor del dependiente periodo anterior (t)</field>
+            <field name="sequence" eval="61"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">MVSFDPA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result =SFDMA*((float(payslip.ufv_inicial)/float(payslip.ufv_final))-1)</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_periodo_anterior_actualizado" model="hr.salary.rule">
+            <field name="name">Saldo del periodo anterior actualizado (u)</field>
+            <field name="sequence" eval="62"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">SPAACT</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result =SFDMA+MVSFDPA</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_saldo_utilizado" model="hr.salary.rule">
+            <field name="name">Saldo Utilizado (v)</field>
+            <field name="sequence" eval="63"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">SUTILIZADO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"># Inicializar la variable saldo_utilizado
+saldo_utilizado = 0.00
+
+# Evaluar las condiciones
+if float(SPAACT) > float(SALDOFISCO):
+    saldo_utilizado = float(SALDOFISCO)
+else:
+    saldo_utilizado = float(SPAACT)
+
+# Asignar el valor final a la variable 'result'
+result = saldo_utilizado
+            </field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_rciva_retenido" model="hr.salary.rule">
+            <field name="name">Impuesto RC-IVA retenido (w)</field>
+            <field name="sequence" eval="64"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">RCIVARETENIDO</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">impuesto_rc_iva_retenido = 0.00
+if float(SALDOFISCO)>float(SUTILIZADO):
+    impuesto_rc_iva_retenido = float(SALDOFISCO) - float(SUTILIZADO)
+result = impuesto_rc_iva_retenido</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_pc7rg_periodo_anterior" model="hr.salary.rule">
+            <field name="name">Pago a cuenta SIETE-RG periodo anterior (x)</field>
+            <field name="sequence" eval="65"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">PCSIETERGPA</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">fix</field>
+            <field eval="0" name="amount_fix"/>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+       
+        <record id="hr_rule_f110_casilla465" model="hr.salary.rule">
+            <field name="name">F-110 Casilla 465 (y)</field>
+            <field name="sequence" eval="66"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">F110C465</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">fix</field>
+            <field eval="0" name="amount_fix"/>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_tpc7rg_periodo" model="hr.salary.rule">
+            <field name="name">Total saldo pago a cuenta SIETE-RG del periodo (z)</field>
+            <field name="sequence" eval="67"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">TPASIETERGP</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = PCSIETERGPA + F110C465</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_pc7rg_utilizado" model="hr.salary.rule">
+            <field name="name">Pago a cuenta SIETE-RG utilizado (aa)</field>
+            <field name="sequence" eval="68"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">PASIETERGU</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">saldo_sieterg_utilizado = 0.00
+if float(RCIVARETENIDO)>=float(TPASIETERGP):
+    saldo_sieterg_utilizado = float(TPASIETERGP)
+else:
+    saldo_sieterg_utilizado = float(RCIVARETENIDO)
+result = saldo_sieterg_utilizado</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_rciva_retenido_final" model="hr.salary.rule">
+            <field name="name">Impuesto RC-IVA retenido Final (ab)</field>
+            <field name="sequence" eval="69"/>
+            <field name="appears_on_payslip">True</field>
+            <field name="code">RCIVARETENIDOF</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = RCIVARETENIDO - PASIETERGU</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_saldo_mes_siguiente" model="hr.salary.rule">
+            <field name="name">Saldo de Crédito Fiscal a favor del dependiente para el mes siguiente (ac)</field>
+            <field name="sequence" eval="70"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">SCFFDMS</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = SALDODEPEN + SPAACT - SUTILIZADO</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_s7rg_mes_siguiente" model="hr.salary.rule">
+            <field name="name">Saldo de pago a cuenta  SIETE-RG a favor del dependiente para el mes siguiente (ad)</field>
+            <field name="sequence" eval="71"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">S7RGMS</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.RCIVA"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = TPASIETERGP - PASIETERGU</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_anticipos" model="hr.salary.rule">
+            <field name="name">Anticipos de Sueldo</field>
+            <field name="sequence" eval="21"/>
+            <field name="appears_on_payslip">True</field>
+            <field name="code">ANTS</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.total_anticipos</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_multas" model="hr.salary.rule">
+            <field name="name">Multas por Retrazo</field>
+            <field name="sequence" eval="22"/>
+            <field name="appears_on_payslip">True</field>
+            <field name="code">MULTAS</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.total_multas</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+
+        <record id="hr_rule_otros_descuento" model="hr.salary.rule">
+            <field name="name">Otros descuentos</field>
+            <field name="sequence" eval="23"/>
+            <field name="appears_on_payslip">True</field>
+            <field name="code">ODESC</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.total_descuentos</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        
+        <record id="hr_rule_total_descuento" model="hr.salary.rule">
+            <field name="name">Total Descuentos</field>
+            <field name="sequence" eval="70"/>
+            <field name="appears_on_payslip">True</field>
+            <field name="code">TDESC</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.TDESC"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = ODESC+AFPAL+RCIVARETENIDOF+AFPASN+ANTS</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        
+        <record id="hr_rule_liquido_pagable" model="hr.salary.rule">
+            <field name="name">Liquido Pagable</field>
+            <field name="sequence" eval="71"/>
+            <field name="appears_on_payslip">True</field>
+            <field name="code">NETO</field>
+            <field name="category_id" ref="hr_payroll.NET"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = GROSS- categories['DED']</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>
+        
+        <record id="hr_rule_aporte_css" model="hr.salary.rule">
+            <field name="name">Aporte Patronal CSS</field>
+            <field name="sequence" eval="24"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">APCSS</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.COMP"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = GROSS * (10/100)</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record>  
+        
+        <record id="hr_rule_aguinaldos" model="hr.salary.rule">
+            <field name="name">Provisión para Aguinaldos</field>
+            <field name="sequence" eval="25"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">PAGUI</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.COMP"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = GROSS * (8.33/100)</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record> 
+        
+        <record id="hr_rule_indemnizaciones" model="hr.salary.rule">
+            <field name="name">Provisión para Indemnizaciones</field>
+            <field name="sequence" eval="26"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">PINDEM</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.COMP"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = GROSS * (8.33/100)</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record> 
+        
+        <record id="hr_rule_total_cargas_sociales" model="hr.salary.rule">
+            <field name="name">Total Cargas Sociales</field>
+            <field name="sequence" eval="27"/>
+            <field name="appears_on_payslip">False</field>
+            <field name="code">TCARS</field>
+            <field name="category_id" ref="acoim_planillas_enterprise_base.COMP"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['COMP']</field>
+            <field name="struct_id" ref="acoim_planillas_enterprise_base.estructura_base"/>
+        </record> 
+    </data>
+</odoo>

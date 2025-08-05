@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+   <template id="report_payslip_inherit">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="header" style="font-size: 5px;">
+<br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 40px;" alt="Logo"/>
+                </div>
+
+
+                <div class="page"  style="font-size: 5px;">
+                    <div  style="border:solid; border-radius:10px; border-width:2px; color:balck;font-size: 16px;">
+                            <table width="100%">
+                                <tbody>
+                                    <tr  style="font-size: 10px;">
+                                        <td width="75%" align="center"><b><span t-field="o.company_id.name"/></b></td>
+                                        <td width="25%" align="left" ><b><span t-field="o.company_id.vat"/></b></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table width="100%">
+                                <tbody>
+                                    <tr style="font-size: 10px;">
+                                        <td width="50%" align="center" style="font-size: 9px;"><b>Registro Seguro Social</b></td>
+                                        <td width="50%" align="left" ><span t-field="o.company_id.nro_salud"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table width="100%">
+                                <tbody>
+                                    <tr style="font-size: 10px;">
+                                        <td width="50%" align="center"><b><span t-field="o.company_id.vat"/></b></td>
+                                        <td width="50%" align="left" ><span t-field="o.company_id.street"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    <br/>
+                    <div class="row" align="center"  style="font-size: 16px;">
+
+                            <table width="100%">
+                                <tbody>
+                                    <tr style="font-size: 12px;">
+                                        <td width="75%" align="center"><b>PAPELETA DE PAGO DE SUELDOS Y SALARIOS</b></td>
+                                    </tr>
+                                    <tr style="font-size: 10px;">
+                                        <td width="75%" align="center"><b>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</b></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                    </div>
+                    <br/>
+
+
+
+                    <div  style="border:solid; border-radius:10px; border-width:2px; color:black;">
+                            <table width="100%">
+                                <tbody>
+                                    <tr style="font-size: 10px;">
+                                        <td width="30%" align="left"><b> Nombre del empleado :</b>
+                                            
+                                        </td>
+                                        <td width="10%" align="left" style="color:#0056b2;"><b> <span t-field="o.employee_id.barcode"/></b>                                               
+                                        </td>
+                                        <td width="60%"><span t-field="o.employee_id.name"/>
+                                        </td>                                        
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table width="100%">
+                                <tbody>
+                                    <tr style="font-size: 10px;">
+                                        <td width="40%"><b> Cargo :</b>
+                                        <span t-field="o.employee_id.job_title"/>
+                                        </td>
+
+                                        <td width="30%"><b> Carnet :</b><span t-field="o.employee_id.identification_id"/>
+                                            
+                                        </td> 
+                                        <td width="30%"><b> Area/Seccion : </b><span t-field="o.employee_id.name"/>
+                                        </td>                                     
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <table width="100%">
+                                <tbody>
+
+                                    <tr style="font-size: 10px;">
+                                        <td width="30%"><b> Fecha :</b>
+                                        <span t-field="o.date_to"/>
+                                        </td>
+
+                                        <td width="30%"><b> Periodo :</b>
+                                            <span t-esc="o.mes_anio(o.date_to)"/>
+                                        </td> 
+                                        <td width="40%"><b> Tipo de Cambio : </b>
+                                            <span t-esc="o.current_moneda(o.date_to)"/>
+                                        </td>                                     
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table width="100%">
+                                <tbody>
+                                    <tr style="font-size: 10px;">
+                                        <td width="60%"><b> Detalle :</b>
+                                        Sueldo correspodiente a: <span t-esc="o.detalle_mes(o.date_to)"/>
+                                        </td> 
+                                        <td width="40%"><b> Fecha Ingreso : </b>
+                                        <span t-field="o.contract_id.date_start"/>
+                                        </td>                                     
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                    </div>
+ <br/>
+            <div id="total">
+                <table  width="100%">
+
+                    <tr style="font-size: 10px;">
+                        <td width="25%">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+                                    <t t-if="line.code == 'BASIC'">
+                                            <tr style="font-size: 10px;">
+                                                <td>
+                                               <b> <span t-esc="line.name"/></b>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                </table>
+                            </span>   
+                        </td>
+                        <td width="25%">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+                                    <t t-if="line.code == 'BASIC'">
+                                            <tr style="font-size: 10px;">
+                                                <td>
+                                               <b> <span t-esc="line.total"/></b>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </span>
+                        </td>
+                        <td width="25%">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+                                    <t t-if="line.code == 'GROSS'">
+                                            <tr style="font-size: 10px;color:#0056b2;" >
+                                                <td>
+                                               <b> Sueldo Cotizable</b>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                </table>
+                            </span>   
+                        </td>
+                        <td width="25%">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+                                    <t t-if="line.code == 'GROSS'">
+                                            <tr style="font-size: 10px;color:#0056b2;">
+                                                <td>
+                                               <b> <span t-esc="line.total"/></b>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                </table>
+                            </span>
+                        </td>                        
+                    </tr>
+
+
+
+                    <tr style="font-size: 10px;">
+                        <td width="25%">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+
+                                    <t t-if="line.category_id.name == 'Bonos'">
+                                            <tr style="font-size: 10px;">
+                                                <td>
+                                                <span t-esc="line.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </span>   
+                        </td>
+                        <td width="25%">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+
+                                    <t t-if="line.category_id.name == 'Bonos'">
+                                            <tr style="font-size: 10px;">
+                                                <td>
+                                                <span t-esc="line.total"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </span>
+                        </td>
+                        <td width="25%">
+                            <strong><p>Descuentos</p></strong>
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+
+                                    <t t-if="line.category_id.name == 'Descuentos'">
+                                            <tr style="font-size: 10px;">
+                                                <td>
+                                                <span t-esc="line.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </span>   
+                        </td>
+                        <td width="25%">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <table width="100%">
+                                    <t t-if="line.category_id.name == 'Descuentos'">
+                                            <tr style="font-size: 10px;">
+                                                <td>
+                                                <span t-esc="line.total"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </span>
+                        </td>                        
+                    </tr>
+                </table>
+            </div>
+ <br/>
+  <br/>
+                        <div  style="border:solid; border-radius:10px; border-width:2px; color:balck;">
+                            <span t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
+                                <t t-if="line.code == 'NETO'">
+                                    <table width="100%">
+                                        <tr style="font-size: 10px;">
+                                            <td width="70%">
+                                                <p>   
+                                                    <strong><span>Liquido Pagable:</span></strong>
+                                                </p>
+                                                <p>
+                                                    <span>    Liquido Pagable = Sueldo Cotizable - Aportes laborales - Descuentos</span>
+                                                </p>
+                                            </td>
+                                            <td width="30%">
+                                               <strong> <t t-esc="'{:,.2f}'.format((line.total))"/></strong>
+                                                <p>.</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table width="100%">
+                                        <tr style="font-size: 10px;">
+                                            <td width="70%">
+                                                <p>
+                                                    <span>Son:</span>
+                                                    <span t-esc="o.numero_texto(line.total, o.currency_id.symbol)"/>
+                                                </p>
+                                            </td>
+                                            <td width="30%">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </t>
+                                </span>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div>
+                            <table width="100%">
+                                <tr style="font-size: 10px;">
+                                    <td>
+                                      <span t-esc="o.detalle_dia_mes(o.date_to)"/>
+                                        
+                                    </td>
+                                </tr>
+                            </table>
+                                
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                    <div class="row">
+                        <table width="100%">
+                            <tr style="font-size: 10px;">
+                                <td width="10%"></td>
+                                <td class="text-center firmas" width="50%"><b> <span t-esc="o.employee_id.name"/></b></td>
+                                <td width="10%"></td>
+                                <td class="text-center firmas" width="50%"><b> Contabilidad</b></td>
+                            </tr>
+                        </table>
+                    </div>
+  
+                </div>
+                <div class="footer" >
+                </div>
+            </t>
+        </t>
+        </template>
+
+
+</odoo>

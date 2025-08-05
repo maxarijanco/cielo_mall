@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Tree view for "model" -->
+        <record id="view_l10n_bo_acoim_purchase_invoice_tree" model="ir.ui.view">
+            <field name="name">view.l10n.bo.acoim.purchase.invoice.tree</field>
+            <field name="model">l10n.bo.supplier.package</field>
+            <field name="type">tree</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <tree create="true" delete="true" edit="true">
+                    <field name="name" />
+        
+                </tree>
+            </field>
+        </record>
+        
+        <!-- Form view for "model" -->
+        <record id="view_l10n_bo_acoim_purchase_invoice_form" model="ir.ui.view">
+            <field name="name">view.l10n.bo.acoim.purchase.l10n.bo.supplier.package.invoice.form</field>
+            <field name="model">l10n.bo.supplier.package</field>
+            <field name="type">form</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <form string="model_form" create="true" delete="true" edit="true">
+                    <header>
+                        <button name="get_invoices" string="Generar facturas" type="object" icon="fa-list" class="oe_highlight" invisible="state != 'draft'"/>
+                        <button name="reception_action" string="Recepcionar" type="object" icon="fa-play" class="oe_highlight"  invisible="state != 'draft'" confirm="Crear paquete y recepcionar."/>
+                        <button name="validation_action" string="Validar" type="object" icon="fa-play" class="oe_highlight" invisible="state != 'received'"/>
+                        <button name="confirm_action" string="Confirmar" type="object" icon="fa-play" class="oe_highlight" invisible="state != 'validated'"/>
+                        <field name="state" widget="statusbar" />
+                        
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" class="oe_inline"
+                                    placeholder="name" />
+                            </h1>
+                        </div>
+                        <group string="Parametros" >
+                            <group>
+                                <field name="branch_office_id" options="{'no_create': True}"  readonly="state != 'draft'" />
+                                <field name="pos_id" domain="[('branch_office_id', '=', branch_office_id)]" options="{'no_create': True}"  readonly="state != 'draft'"/>
+                                <field name="gestion"  readonly="state != 'draft'" />
+                                <field name="period"  readonly="state != 'draft'" />
+                                
+                            </group>
+                            <group>
+                                <field name="date_send"  readonly="state != 'draft'"/>
+                                <field name="error" invisible="not error" />
+                                
+                                <field name="multipacks" widget="boolean_button" />
+                                
+                            </group>
+                                
+                        </group>
+                        
+                        <group>
+                            <group name="reception_group" string="Recepción">
+                                <field name="success_reception" widget="boolean_toggle" invisible="1" />
+                                <field name="transaction_reception" widget="boolean_toggle"/>
+                                <field name="reception_description" readonly="1" />
+                                <field name="reception_code" readonly="1" />
+                            </group>
+                            <group name="validation_group" string="Validación">
+                                <field name="validation_success" widget="boolean_toggle" invisible="1" />
+                                <field name="validation_transaction" widget="boolean_toggle"/>
+                                <field name="validation_description" readonly="1" invisible="not validation_description" />
+                                <field name="validation_code" readonly="1" />
+                            </group>
+                            
+                        </group>
+                        
+                        <notebook>
+                            
+                            <page string="Facturas"  >
+                                <field name="supplier_package_line_ids" readonly="state != 'draft'" />
+                            </page>
+                            <page string="Mensajes" >
+                                <field name="supplier_message_line_ids"/>
+                            </page>
+                        </notebook>
+                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Search view for "model" -->
+        <record id="view_l10n_bo_acoim_purchase_invoice_search" model="ir.ui.view">
+            <field name="name">view.l10n.bo.supplier.package.invoice.search</field>
+            <field name="model">l10n.bo.supplier.package</field>
+            <field name="type">search</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <search string="Buscar">
+                    <field name="name" />
+                </search>
+            </field>
+        </record>
+        
+        <!-- Main window action for "model" -->
+        <record id="action_l10n_bo_acoim_purchase_invoice_act_window" model="ir.actions.act_window">
+            <field name="name">Paquetes de facturas de proveedores</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">l10n.bo.supplier.package</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crea tu primer paquete de facturas de compras
+                </p>
+            </field>
+        </record>
+        
+
+    </data>
+</odoo>

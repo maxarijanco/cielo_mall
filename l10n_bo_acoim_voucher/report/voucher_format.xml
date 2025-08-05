@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+        <template id="l10n_bo_voucher_format">
+            <t t-call="l10n_bo_acoim_voucher.l10n_bo_acoim_voucher_external_layout">
+                <head>
+                    <meta charset="UTF-8"/>
+                    <style>
+                        
+                    </style>    
+
+                </head>
+                <t t-set="doc" t-value="o.with_context(lang=o.partner_id.lang)"/>
+                <div class="page" style="font-size:15px;font-family: Arial, sans-serif;">
+
+                    <t t-set="local_currency" t-value="o.company_id.currency_id.id == o.currency_id.id"/>
+                    <table border="1" style="width:100%; border: 1px solid white;" class="default">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid black; ">CODIGO</th>
+                                <th t-if="not local_currency" style="border: 1px solid black; width:45%;">DESCRIPCIÓN/GLOSA</th>
+                                <th t-if="local_currency" style="border: 1px solid black; width:47%;">DESCRIPCIÓN/GLOSA</th>
+                                
+                                <th t-if="not local_currency" style="border: 1px solid black; width:12%;"><span t-field="o.currency_id.name" /></th>    
+                                <th t-if="not local_currency" style="border: 1px solid black; width:12%;">DEBE (<span t-field="o.company_id.currency_id.name"/>)  </th>
+                                <th t-if="not local_currency" style="border: 1px solid black; width:12%;">HABER (<span t-field="o.company_id.currency_id.name"/>) </th>
+
+                                <th t-if="local_currency" style="border: 1px solid black; width:17%;">DEBE (<span t-field="o.company_id.currency_id.name"/>)  </th>
+                                <th t-if="local_currency" style="border: 1px solid black; width:17%;">HABER (<span t-field="o.company_id.currency_id.name"/>) </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.line_ids" t-as="line_id">
+                                <tr style="border-bottom: 1px solid silver;">
+                                    <td> <span t-field="line_id.account_id.code" /> </td>
+                                    <td> 
+                                        <b t-field="line_id.account_id.name" /> <br/>
+                                        <span t-field="line_id.name" />
+                                    </td>
+                                    <td t-if="not local_currency" style="text-align: right;"> <span t-if="line_id.amount_currency != 0"> <span t-esc="line_id.get_amount_currency()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /> </span> </td>
+                                    <td style="text-align: right;"> <span t-if="line_id.debit != 0" > <span t-esc="line_id.get_amount_debit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /> </span> </td>
+                                    <td style="text-align: right;"> <span t-if="line_id.credit != 0" > <span t-esc="line_id.get_amount_credit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /> </span> </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tr>
+                            <td colspan="5" style="color:white;" ><br/>.</td>
+                        </tr>
+                        <tr>
+                            <t t-set="amount_currency" t-value="o.getAmountCurrency()"/>
+
+                            <td colspan="2" style="border: 1px solid black;" >
+                                <b>SON:</b> <span t-esc="o.getLiteralVoucher()" /> 
+                            </td>
+                            <td t-if="not local_currency" style="text-align: right; border: 1px solid black;"> <span t-if="amount_currency != 0"><span t-esc="amount_currency" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /></span> <span t-else="else" >0,00</span> </td>
+                            <td style="text-align: right; border: 1px solid black;"> <span t-esc="o.getAmountDebit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /> </td>
+                            <td style="text-align: right; border: 1px solid black;"> <span t-esc="o.getAmountCredit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /> </td>
+                            
+                        </tr>
+                        <tr>
+                            <td t-if="not local_currency" colspan="5" style="border: 1px solid white;" >
+                                <br/>
+                                <b>SON:</b> <span t-esc="o.getLiteralCurrency()" /> 
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </template>
+</odoo>

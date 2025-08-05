@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="view_l10n_bo_pos_register_wizard" model="ir.actions.act_window">
+            <field name="name">Registro de punto de venta</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">l10n.bo.pos.register.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Solicitud de registro de punto de venta.
+                </p>
+            </field>
+        </record>
+        <record id="view_l10n_bo_pos_register_wizard_form" model="ir.ui.view">
+            <field name="name">view_l10n_bo_pos_register_wizard_form</field>
+            <field name="model">l10n.bo.pos.register.wizard</field>
+            <field name="arch" type="xml">
+                <form >
+                    <header>
+                        <button name="test_siat_connection" type="object" string="Verificar conexión con siat" icon="fa-play-circle" />
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                
+                                <field name="pos_type_id" options="{ 'no_open': True, 'no_create': True}" />
+                                <field name="name" />
+                            </group>
+                            <group>
+                                <field name="branch_office_id" readonly="1" />
+                                <field name="pos_id" invisible="1" />
+                                <field name="company_id" invisible="1" />
+                                
+                            </group>
+                            
+                            <separator string="Descripcion" colspan="4" />
+                            
+                            <field name="description" placeholder='Informacion adicional' />
+                            
+                        </group>
+                        
+                    </sheet>
+                    <footer>
+                        <button name="button_action_pos_register" string="Solicitar registro" type="object" class="btn-primary"/>
+                        <button string="Cancelar" special="cancel" class="oe_link"/>
+                        
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

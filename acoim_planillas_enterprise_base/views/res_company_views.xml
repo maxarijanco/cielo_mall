@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="acoim_rrhh_view_company_form_inherit" model="ir.ui.view">
+        <field name="name">acoim.rrhh.view.company.form.inherit</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="nro_salud"/>
+                <field name="nro_ministerio"/>
+                <field name="responsable_legal_partner"/>
+                <field name="responsable_legal"/>
+                <field name="ci_responsable_legal"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

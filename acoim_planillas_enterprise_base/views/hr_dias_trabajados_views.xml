@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="planilla_empleados_dias_trabajados_tree" model="ir.ui.view">
+        <field name="name">hr.planilla.dias.trabajados.tree</field>
+        <field name="model">hr.dias.trabajados</field>
+        <field name="arch" type="xml">
+            <tree string="Planilla Empleados RC-IVA">
+                <field name="mes"/>
+                <field name="anio"/>
+                <field name="compania"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="Planilla_Empleados_dias_trabajadosform" model="ir.ui.view">
+        <field name="name">hr.dias.trabajados.form</field>
+        <field name="model">hr.dias.trabajados</field>
+        <field name="arch" type="xml">
+            <form string="Planilla Empleados dias Trabajados">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,activo,inactivo"/>
+                </header>
+                    <group>
+                        <field name="mes"/>
+                        <field name="anio"/>
+                        <field name="compania"/>
+                    </group>
+                    <button name="action_generar_empleados" class="btn-primary" icon="fa-check" type="object" string="Planilla Empleados"/>
+                    <group>
+                        <field name="detalle_planilla" nolabel="1">
+                        <tree string="Detalle Planilla Dias trabajados" editable="bottom">
+                                <field name="empleado"/>
+                                <field name="dias_trabajados"/>
+                                <field name="nota"/>
+                                <field name="compania"/>
+                        </tree>
+                    </field>
+                    </group>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="planilla_empleados_dias_trabajados" model="ir.actions.act_window">
+        <field name="name">Planilla Dias trabajados</field>
+        <field name="res_model">hr.dias.trabajados</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="planilla_empleados_dias_trabajados_tree"/>
+    </record>
+
+    <menuitem id="menu_planilla_empleados_dias" name="Planilla Dias Trabajados" parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root" action="planilla_empleados_dias_trabajados" sequence="10"/>
+
+
+    <record id="planilla_empleados_retro_tree" model="ir.ui.view">
+        <field name="name">hr.retroactivos.tree</field>
+        <field name="model">hr.retroactivos</field>
+        <field name="arch" type="xml">
+            <tree string="Planilla Empleados">
+                <field name="anio"/>
+                <field name="compania"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="empleados_retroactos_trabajadosform" model="ir.ui.view">
+        <field name="name">hr.retroactivos.form</field>
+        <field name="model">hr.retroactivos</field>
+        <field name="arch" type="xml">
+            <form string="Planilla retroactivo">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,activo,inactivo"/>
+                </header>
+                    <group>
+                        <field name="meses"  widget="many2many_tags"/>
+                        <field name="departamentos"  widget="many2many_tags"/>
+                        <field name="porcentaje"/>
+                        <field name="anio"/>
+                        <field name="compania"/>
+                    </group>
+                    <button name="action_generar_empleados" class="btn-primary" icon="fa-check" type="object" string="Planilla Empleados"/>
+                    <group>
+                        <field name="detalle_planilla" nolabel="1">
+                        <tree string="Detalle Planilla Dias trabajados" editable="bottom">
+                                <field name="empleado"/>
+                                <field name="porcentaje"/>
+                                <field name="compania"/>
+                        </tree>
+                    </field>
+                    </group>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="empleados_retroactivos_trabajados" model="ir.actions.act_window">
+        <field name="name">Planilla retroactivos trabajados</field>
+        <field name="res_model">hr.retroactivos</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="planilla_empleados_retro_tree"/>
+    </record>
+
+    <menuitem id="menu_empleados_retroactivos" name="Planilla Porcentaje Retroactivos" parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root" action="empleados_retroactivos_trabajados" sequence="10"/>
+
+
+</odoo>

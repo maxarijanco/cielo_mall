@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista en árbol para Planilla Empleados -->
+    <record id="planilla_empleados_tree" model="ir.ui.view">
+        <field name="name">hr.planilla.tree</field>
+        <field name="model">hr.planilla</field>
+        <field name="arch" type="xml">
+            <tree string="Planilla Empleados">
+                <field name="payslip"/>
+                <field name="compania"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de formulario para Planilla Empleados -->
+    <record id="Planilla_Empleados_form" model="ir.ui.view">
+        <field name="name">hr.planilla.form</field>
+        <field name="model">hr.planilla</field>
+        <field name="arch" type="xml">
+            <form string="Planilla Empleados">
+                <header>
+                    <!-- Eliminamos 'states' del botón -->
+                    <button string="Imprimir Planilla" name="generar_planilla" type="object" class="btn-primary"/>
+                    <button string="Imprimir Planilla TXT" name="generar_planilla_csv" type="object" class="btn-primary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,activo,inactivo"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="payslip"/>
+                        <field name="compania"/>
+                    </group>
+                    <button name="action_generar_planilla" class="btn-primary" icon="fa-check" type="object" string="Planilla de Sueldos y Salarios"/>
+                    <group>
+                        <field name="detalle_planilla" nolabel="1">
+                            <tree string="Detalle Planilla" editable="bottom">
+                                <field name="empleado"/>
+                                <field name="numero"/>
+                                <field name="documento"/>
+                                <field name="nombres"/>
+                                <field name="pais"/>
+                                <field name="sexo"/>
+                                <field name="cargo"/>
+                                <field name="fecha_ingreso"/>
+                                <field name="dias_pagados"/>
+                                <field name="haber_basico"/>
+                                <field name="incremento_salarial"/>
+                                <field name="horas_pagadas"/>
+                                <field name="bono_antiguedad"/>
+                                <field name="numero_horas"/>
+                                <field name="monto_pagado"/>
+                                <field name="bono_produccion"/>
+                                <field name="pago_dominical"/>
+                                <field name="otros_bonos"/>
+                                <field name="total_ganado"/>
+                                <field name="sistema_integral"/>
+                                <field name="aporte_nacional"/>
+                                <field name="rc_iva"/>
+                                <field name="otros_descuentos"/>
+                                <field name="anticipos"/>
+                                <field name="total_descuentos"/>
+                                <field name="liquido_pagable"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción para Planilla Empleados -->
+    <record id="planilla_empleados_action" model="ir.actions.act_window">
+        <field name="name">Planilla Empleados</field>
+        <field name="res_model">hr.planilla</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="planilla_empleados_tree"/>
+    </record>
+
+    <!-- Menú para Planilla Empleados -->
+    <menuitem id="menu_planilla_empleados" name="Planilla de Sueldos y Salarios" parent="hr_payroll.menu_hr_payroll_report" action="planilla_empleados_action" sequence="10"/>
+
+    <!-- Alternativa de menú comentada -->
+    <!--
+    <menuitem id="menu_planilla_empleados" name="Planilla de Sueldos y Salarios" parent="om_hr_payroll.menu_hr_payroll_global_settings" action="planilla_empleados_action" sequence="10"/>
+    -->
+    <!-- Definición de la vista en formato árbol (tree) -->
+    <record id="planilla_retroactivos_tree" model="ir.ui.view">
+        <field name="name">hr.retroactivo.empleados.tree</field>
+        <field name="model">hr.retroactivo.empleados</field>
+        <field name="arch" type="xml">
+            <tree string="Planilla Retroactivos">
+                <field name="payslip_retro"/>
+                <field name="compania"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Definición de la vista en formato formulario (form) -->
+    <record id="Planilla_Retroactivo_form" model="ir.ui.view">
+        <field name="name">hr.retroactivo.empleados.form</field>
+        <field name="model">hr.retroactivo.empleados</field>
+        <field name="arch" type="xml">
+            <form string="Planilla Empleados Retroactivo">
+                <header>
+                    <!-- Botones con condiciones de visibilidad usando attrs -->
+                    <button string="Imprimir Planilla" name="generar_planilla" type="object" class="btn-primary" modifiers="{'invisible': [('state', '!=', 'activo')]}"/>
+                    <button string="Imprimir Planilla TXT" name="generar_planilla_csv" type="object" class="btn-primary" modifiers="{'invisible': [('state', '!=', 'activo')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,activo,inactivo"/>
+                </header>
+
+                <!-- Grupo de campos principales -->
+                <group>
+                    <field name="payslip_retro"/>
+                    <field name="compania"/>
+                </group>
+
+                <!-- Botón adicional -->
+                    <button name="action_generar_planilla" class="btn-primary" icon="fa-check" type="object" string="Planilla de Retroactivos"/>
+
+                <!-- Definición del árbol para el detalle de la planilla -->
+                <group>
+                    <field name="detalle_planilla" nolabel="1">
+                    <tree string="Detalle Planilla" editable="bottom">
+                            <field name="numero"/>
+                            <field name="carnet"/>
+                            <field name="empleado"/>
+                            <field name="genero"/>
+                            <field name="cargo"/>
+                            <field name="fecha_ingreso"/>
+                            <field name="haber_basico_ant"/>
+                            <field name="haber_basico_inc"/>
+                            <field name="bono_antiguedad_ant"/>
+                            <field name="bono_antiguedad_act"/>
+                            <field name="enero_retro"/>
+                            <field name="bono_enero_retro"/>
+                            <field name="febrero_retro"/>
+                            <field name="bono_febrero_retro"/>
+                            <field name="marzo_retro"/>
+                            <field name="bono_marzo_retro"/>
+                            <field name="abril_retro"/>
+                            <field name="bono_abril_retro"/>
+                            <field name="mayo_retro"/>
+                            <field name="bono_mayo_retro"/>
+                            <field name="total_retroactivo"/>
+                            <field name="afp_retro"/>
+                            <field name="rciva"/>
+                            <field name="otros_descuentos"/>
+                            <field name="total_descuentos"/>
+                            <field name="liquido_pagable"/>
+
+                    </tree>
+                    </field>
+
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Definición de la acción de ventana -->
+    <record id="planilla_retroativo_action" model="ir.actions.act_window">
+        <field name="name">Planilla Retroactivos</field>
+        <field name="res_model">hr.retroactivo.empleados</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="planilla_retroactivos_tree"/>
+    </record>
+    
+    <!-- Definición del menú -->
+    <menuitem id="menu_planilla_retroactivo" name="Planilla de Retroactivos" parent="hr_payroll.menu_hr_payroll_report" action="planilla_retroativo_action" sequence="10"/> 
+
+</odoo>

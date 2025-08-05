@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="l10n_bo_purchase_register_id" model="l10n.bo.purchase.register">
+            <field name="name">Registro de compras (BO)</field>
+        </record>
+    </data>
+</odoo>

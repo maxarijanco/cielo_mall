@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="view_l10n_bo_rent_form" model="ir.ui.view">
+            <field name="name">view_l10n_bo_rent_form</field>
+            <field name="model">account.move</field>
+            <field name="priority" eval="18"/>
+            <field name="inherit_id" ref="l10n_bo_bolivian_invoice.l10n_bo_account_move_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//div[@name='journal_div']" position="after">
+
+                    <label for="from_period" invisible="document_type_code not in [2,11]" />
+
+                    <div name="period_div" class="d-flex" invisible="document_type_code not in [2,11]" >
+                        
+                        <field name="from_period" required="document_type_code in [2,11]" />
+
+                        <span class="oe_inline o_form_label mx-3" invisible="document_type_code not in [2]" >al</span>
+                        <field name="to_period"  required="document_type_code in [2]" invisible="document_type_code not in [2]" />
+                        
+                    </div>
+                    
+                    <!-- <field name="emision_type_id"  invisible="not edi_bo_invoice" options="{ 'no_open': True}"/> -->
+                    
+                </xpath>
+                
+            </field>
+        </record>
+
+    </data>
+</odoo>

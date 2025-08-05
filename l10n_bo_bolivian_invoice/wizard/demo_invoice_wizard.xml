@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="view_demo_invoice_wizard" model="ir.actions.act_window">
+            <field name="name">Facturas de demostracion</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">demo.invoice.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crea tu primer Facturas de pruebas.
+                </p>
+            </field>
+        </record>
+        <record id="view_demo_invoice_wizard_tree" model="ir.ui.view">
+            <field name="name">view_demo_invoice_wizard_tree</field>
+            <field name="model">demo.invoice.wizard</field>
+            <field name="arch" type="xml">
+                <form >
+                    <header>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="journal_id" options="{'no_create': True, 'no_open': True}" />
+                                <field name="type" />
+                                
+                            </group>
+                            <group>
+                                
+                                <field name="name" readonly="1" />
+                                
+                                <separator string="Todas las facturas de prueba se crean es estado borrador por defecto" colspan="2" />
+                            </group>
+                        </group>
+                        <br/>
+                        <notebook>
+                            <page string="Facturas ->" invisible="type != 'invoice'" >
+                                <group>
+                                    <group>
+                                        <field name="partner_id" options="{'no_create': True, 'no_open': True}" />
+                                    </group>
+                                </group>
+                                <field name="demo_invoice_line_ids"/>
+                            </page>
+                            <page string="Anuaciones ->" invisible="type != 'invoice'">
+                                <field name="demo_invoice_cancellation_line_ids"/>
+                            </page>
+                            <page string="Reverciones [X]" invisible="type != 'invoice'">
+                                <field name="demo_invoice_reversion_line_ids"/>
+                            </page>
+
+                            <page string="Paquetes [||||]" invisible="type != 'package'">
+                                <group>
+                                    <group>
+                                        <field name="partner_id" options="{'no_create': True, 'no_open': True}" />
+                                    </group>
+                                </group>
+                                <field name="demo_invoice_package_line_ids"/>
+                            </page>
+                            
+                        </notebook>
+                    </sheet>
+                    <footer>
+                        <button name="action_done" string="Crear facturas" type="object" class="btn-primary"/>
+                        <button name="action_cancel" string="Cancelar" type="object"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

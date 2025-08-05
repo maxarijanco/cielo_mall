@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_l10n_bo_supplier_package_line,access.l10n.bo.supplier.package.line,model_l10n_bo_supplier_package_line,,1,1,1,1
+access_l10n_bo_supplier_package_message,access.l10n.bo.supplier.package.message,model_l10n_bo_supplier_package_message,,1,1,1,1
+access_l10n_bo_supplier_package,access.l10n.bo.supplier.package,model_l10n_bo_supplier_package,,1,1,1,1

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Definición de la vista en formato árbol (tree) -->
+    <record id="planilla_empleados_iva_tree" model="ir.ui.view">
+        <field name="name">hr.planilla.tree</field>
+        <field name="model">hr.planilla.iva</field>
+        <field name="arch" type="xml">
+            <tree string="Planilla Empleados RC-IVA">
+                <field name="payslip"/>
+                <field name="compania"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Definición de la vista en formato formulario (form) -->
+    <record id="Planilla_Empleados_Iva_form" model="ir.ui.view">
+        <field name="name">hr.planilla.form</field>
+        <field name="model">hr.planilla.iva</field>
+        <field name="arch" type="xml">
+            <form string="Planilla Empleados RC-IVA">
+                <header>
+                    <!-- Botones con condiciones de visibilidad usando attrs -->
+                    <button string="Imprimir Planilla RC-IVA" name="generar_planilla_rciva" type="object"
+                        class="btn-primary" modifiers="{'invisible': [('state', '!=', 'activo')]}"/>
+                    <button string="Imprimir Planilla RC-IVA TXT" name="generar_planilla_rciva_csv" type="object" class="btn-primary" 
+                        modifiers="{'invisible': [('state', '!=', 'activo')]}"/>
+                    <!-- Campo state como statusbar -->
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,activo,inactivo"/>
+                </header>
+
+                <!-- Grupo de campos principales -->
+                <group>
+                    <field name="payslip"/>
+                    <field name="ufv_inicial"/>
+                    <field name="ufv_final"/>
+                    <field name="compania"/>
+                </group>
+
+                <!-- Botón adicional -->
+                <button name="action_generar_planilla_iva" class="btn-primary" icon="fa-check" type="object" string="Planilla RC-IVA"/>
+
+                <!-- Definición del árbol para el detalle de la planilla -->
+                <group>
+                    <field name="detalle_planilla" nolabel="1">
+                        <tree string="Detalle Planilla" editable="bottom">
+                            <field name="anio"/>
+                            <field name="empleado"/>
+                            <field name="periodo"/>
+                            <field name="documento_dependiente"/>
+                            <field name="nombres"/>
+                            <field name="primer_apellido"/>
+                            <field name="segundo_apellido"/>
+                            <field name="documento"/>
+                            <field name="tipo_documento"/>
+                            <field name="novedades"/>
+                            <field name="monto_ingreso"/>
+                            <field name="salarios_minimos"/>
+                            <field name="importe_sujeto"/>
+                            <field name="rc_iva"/>
+                            <field name="rc_iva_salarios_minimos"/>
+                            <field name="impuesto_neto_rc_iva"/>
+                            <field name="total_facturas"/>
+                            <field name="saldo_fisco"/>
+                            <field name="saldo_favor_dependiente"/>
+                            <field name="saldo_periodo_anterior"/>
+                            <field name="mantenimiento_periodo_anterior"/>
+                            <field name="saldo_periodo_anterior_actualizado"/>
+                            <field name="saldo_utilizado"/>
+                            <field name="saldo_sujeto_retencion"/>
+                            <field name="pago_acuenta_periodo_anterior"/>
+                            <field name="facturas_retenciones"/>
+                            <field name="total_facturas_retenciones"/>
+                            <field name="retenciones_saldo_utilizado"/>
+                            <field name="impuesto_rc_iva_retenido"/>
+                            <field name="saldo_siguiente_mes"/>
+                            <field name="saldo_retencion_siguiente_mes"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Definición de la acción de ventana -->
+    <record id="planilla_empleados_iva_action" model="ir.actions.act_window">
+        <field name="name">Planilla Empleados RC-IVA</field>
+        <field name="res_model">hr.planilla.iva</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="planilla_empleados_iva_tree"/>
+    </record>
+
+    <!-- Definición del menú -->
+    <menuitem id="menu_planilla_empleados_iva" name="Planilla RC-IVA" parent="hr_payroll.menu_hr_payroll_report" action="planilla_empleados_iva_action" sequence="10"/>
+</odoo>

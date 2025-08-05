@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_payslip_form_inherit" model="ir.ui.view">
+        <field name="name">acoim.hr.payslip.form.inherit</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <!-- <field name="inherit_id" ref="om_hr_payroll.view_hr_payslip_form"/> -->
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page[@name='account_info']" position="after">
+                <page string="Accounting Information">
+                    <group>
+                        <field name="horas_extra"/>
+                        <field name="incremento"/>
+                        <field name="porcentaje"/>
+                        <field name="bono_antiguedad"/>
+                        <field name="bono_produccion"/>
+                        <field name="bono_dominical"/>
+                        <field name="salario_minimo"/>
+                        <field name="salario_minimo_act"/>
+                        <field name="total_descuentos"/>
+                        <field name="total_bonos"/>
+                        <field name="facturas_presentadas"/>
+                        <field name="facturas_retenciones"/>
+                        <field name="saldo_favor_depend_ant"/>
+                        <field name="saldo_favor_reten_ant"/>
+                        <field name="ufv_inicial"/>
+                        <field name="ufv_final"/>
+                        <field name="anios_empleado"/>
+                        <field name="jubilado"/>
+                        <field name="dias_trabajados"/>
+                        <field name="retroactivo"/>
+                        <field name="retro_enero"/>
+                        <field name="retro_febrero"/>
+                        <field name="retro_marzo"/>
+                        <field name="retro_abril"/>
+                        <field name="retro_mayo"/>
+
+                        <field name="total_descuentos_anticipos"/>
+                        <field name="total_descuentos_multas"/>
+
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="hr_payslipss_run_form_inherit" model="ir.ui.view">
+        <field name="name">acoim.hr.payslip.run.form.inherit</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="inherit_id" ref="hr_payroll.hr_payslip_run_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='country_id']" position="after">
+                <field name="retroactivo"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

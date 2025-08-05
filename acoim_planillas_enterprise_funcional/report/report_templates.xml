@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <report
+            id="planilla_carta"
+            string="Planilla"
+            model="hr.payslip"
+            report_type="qweb-pdf"
+            file="acoim_planillas_enterprise_funcional.report_payslip_inherit"
+            name="acoim_planillas_enterprise_funcional.report_payslip_inherit"
+            attachment_use="True"
+            menu="False"
+        />
+        <record id="paperformat_hrplanilla" model="report.paperformat">
+            <field name="name">Formato Planilla</field>
+            <field name="default" eval="True" />
+          <field name="format">custom</field>
+          <field name="orientation">Portrait</field>
+          <field name="page_height">215</field>
+          <field name="page_width">140</field>
+          <field name="margin_top">10</field>
+          <field name="margin_bottom">0</field>
+          <field name="margin_left">5</field>
+          <field name="margin_right">5</field>
+          <field name="header_spacing">10</field>
+          <field name="header_line" eval="False" />
+          <field name="dpi">90</field>
+        </record>
+</odoo>

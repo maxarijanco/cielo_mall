@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="tax_ice_purchase_group" model="account.tax.group">
+            <field name="name">RC ICE</field>
+            <field name="sequence">10</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">ice</field>
+            
+        </record>
+        <record id="tax_iehd_purchase_group" model="account.tax.group">
+            <field name="name">RC IEHD</field>
+            <field name="sequence">30</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">iehd</field>
+        </record>
+        <record id="tax_ipj_purchase_group" model="account.tax.group">
+            <field name="name">RC IPJ</field>
+            <field name="sequence">40</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">ipj</field>
+        </record>
+        <record id="tax_rate_purchase_group" model="account.tax.group">
+            <field name="name">RC Tasas</field>
+            <field name="sequence">50</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">rate</field>
+        </record>
+        <record id="tax_no_iva_purchase_group" model="account.tax.group">
+            <field name="name">RC no sujeto a C.F.</field>
+            <field name="sequence">60</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">no_iva</field>
+        </record>
+        <record id="tax_exempt_purchase_group" model="account.tax.group">
+            <field name="name">RC Exentos</field>
+            <field name="sequence">70</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">exempt</field>
+        </record>
+        <record id="tax_zero_rate_purchase_group" model="account.tax.group">
+            <field name="name">RC Tasa cero</field>
+            <field name="sequence">80</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">cero_rate</field>
+        </record>
+        <record id="tax_dui_dim_purchase_group" model="account.tax.group">
+            <field name="name">RC IVA Importaciones (DUI/DIM)</field>
+            <field name="sequence">90</field>
+            <field name="country_id" ref="base.bo"/>
+            <field name="column_rc_type">dui_dim</field>
+        </record>
+        
+    </data>
+</odoo>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_bonos_tree" model="ir.ui.view">
+        <field name="name">hr.bono.tree</field>
+        <field name="model">hr.bono</field>
+        <field name="arch" type="xml">
+            <tree string="Bono" editable="top">
+                <field name="bono"/>
+                <field name="modo_bono"/>
+                <field name="employee"/>
+                <field name="company_id"/>
+                <field name="fecha_bono"/>
+                <field name="monto"/>
+                <field name="nota"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_bonos_action" model="ir.actions.act_window">
+        <field name="name">Bonos</field>
+        <field name="res_model">hr.bono</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_bonos_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_bonos"
+        name="Asignacion Bono"
+        action="hr_bonos_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="14"
+    />
+
+    <menuitem
+        id="menu_hr_bonos"
+        name="Asignacion Bono"
+        action="hr_bonos_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="14"
+    />
+    <record id="hr_tipo_bonos_tree" model="ir.ui.view">
+        <field name="name">hr.tipo.bono.tree</field>
+        <field name="model">hr.tipo.bono</field>
+        <field name="arch" type="xml">
+            <tree string="Tipo bono" editable="top">
+                <field name="name"/>
+                <field name="modo_bono"/>
+                <field name="monto"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_tipo_bonos_action" model="ir.actions.act_window">
+        <field name="name">Tipo Bonos</field>
+        <field name="res_model">hr.tipo.bono</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_tipo_bonos_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_tipo_bono"
+        name="Tipo Bonos"
+        action="hr_tipo_bonos_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="11"
+    />
+<menuitem
+        id="menu_hr_tipo_bono"
+        name="Tipo Bonos"
+        action="hr_tipo_bonos_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="11"
+    />
+</odoo>

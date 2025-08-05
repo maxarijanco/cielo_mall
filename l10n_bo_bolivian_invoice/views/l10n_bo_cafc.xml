@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="view_l10n_bo_cafc" model="ir.actions.act_window">
+            <field name="name">Codigos CAFC</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">l10n.bo.cafc</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crea tu primer codigo de autorizacion de facturas de contingencia
+                </p>
+            </field>
+        </record>
+        <record id="view_l10n_bo_cafc_tree" model="ir.ui.view">
+            <field name="name">l10n.bo.cafc.tree</field>
+            <field name="model">l10n.bo.cafc</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="document_type_id"/>
+                    <field name="economic_activity_id"/>
+                                
+                    <field name="from_sequence"/>
+                    <field name="to_sequence"/>
+                    <field name="actual_sequence"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_l10n_bo_cafc_form" model="ir.ui.view">
+            <field name="name">l10n.bo.cafc.form</field>
+            <field name="model">l10n.bo.cafc</field>
+            <field name="arch" type="xml">
+                <form duplicate="false">
+                    <sheet>
+                        
+                        <separator string="Registro de codigo de autorización de facturas de contingencia - CAFC" colspan="4" />
+                            
+                        
+                        <group>
+                            <group string="Informacion" >
+                                <field name="name"/>
+                                <field name="branch_office_id" invisible="branch_office_id"  required="1" options="{ 'no_open': True, 'no_create': True}"/>
+
+                                <field name="document_type_id" options="{ 'no_open': True, 'no_create': True}"/>
+                                <field name="economic_activity_id" options="{ 'no_open': True, 'no_create': True}"/>
+                                  
+                            </group>
+
+                            <group string="Rangos de secuencia">
+                                <span class="oe_inline o_form_label mx-3"  >Rangos</span>    
+
+                                <div name="period_div" class="d-flex">
+                                    
+                                    <field name="from_sequence"/>
+
+                                    <span class="oe_inline o_form_label mx-3"  >-</span>
+                                    <field name="to_sequence"  />
+                                    
+                                </div>
+                                <field name="actual_sequence"/>  
+                            </group>
+                        </group>
+                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

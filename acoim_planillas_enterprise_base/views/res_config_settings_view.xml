@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_incremento_salarial_tree" model="ir.ui.view">
+        <field name="name">hr.incremento.salarial.tree</field>
+        <field name="model">hr.incremento.salarial</field>
+        <field name="arch" type="xml">
+            <tree string="Incremento Salarial" editable="top">
+                <field name="fecha_promulgacion"/>
+                <field name="decreto_supremo"/>
+                <field name="aumento_salario_basico"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_incremento_salarial_action" model="ir.actions.act_window">
+        <field name="name">Incremento Salarial</field>
+        <field name="res_model">hr.incremento.salarial</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_incremento_salarial_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_incremento_salarial"
+        name="Incremento Salarial"
+        action="hr_incremento_salarial_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="10"
+    />
+<!--     <menuitem
+        id="menu_hr_incremento_salarial"
+        name="Incremento Salarial"
+        action="hr_incremento_salarial_action"
+        parent="om_acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="10"
+    /> -->
+
+    <record id="hr_salario_basico_tree" model="ir.ui.view">
+        <field name="name">hr.salario.basico.tree</field>
+        <field name="model">hr.salario.basico</field>
+        <field name="arch" type="xml">
+            <tree string="Salario Basico" editable="top">
+                <field name="fecha"/>
+                <field name="monto"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_salario_basico_action" model="ir.actions.act_window">
+        <field name="name">Salario Minimo</field>
+        <field name="res_model">hr.salario.basico</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_salario_basico_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_salario_basico"
+        name="Salario Minimo"
+        action="hr_salario_basico_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="10"
+    />
+<!--     <menuitem
+        id="menu_hr_salario_basico"
+        name="Salario Minimo"
+        action="hr_salario_basico_action"
+        parent="om_acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="10"
+    /> -->
+    <record id="hr_bono_antiguedad_tree" model="ir.ui.view">
+        <field name="name">hr.bono.antiguedad.tree</field>
+        <field name="model">hr.bono.antiguedad</field>
+        <field name="arch" type="xml">
+            <tree string="Bono Antiguedad" editable="top">
+                <field name="anio_inicial"/>
+                <field name="anio_final"/>
+                <field name="monto"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_bono_antiguedad_action" model="ir.actions.act_window">
+        <field name="name">Bono Antiguedad</field>
+        <field name="res_model">hr.bono.antiguedad</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_bono_antiguedad_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_bono_antiguedad"
+        name="Bono Antiguedad"
+        action="hr_bono_antiguedad_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="10"
+    />
+<!--     <menuitem
+        id="menu_hr_bono_antiguedad"
+        name="Bono Antiguedad"
+        action="hr_bono_antiguedad_action"
+        parent="om_acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="10"
+    /> -->
+</odoo>

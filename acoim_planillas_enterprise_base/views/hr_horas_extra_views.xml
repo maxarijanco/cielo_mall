@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_asigncion_horas_extra_tree" model="ir.ui.view">
+        <field name="name">hr.asignacion.horas.extra.tree</field>
+        <field name="model">hr.asignacion.horas.extra</field>
+        <field name="arch" type="xml">
+            <tree string="Asignacion Horas" editable="top">
+                <field name="employee"/>
+                <field name="company_id"/>
+                <field name="modo"/>
+                <field name="fecha_asignada"/>
+                <field name="numero_horas"/>
+                <field name="valor"/>
+                <field name="nota"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_asignacion_horas_extra_action" model="ir.actions.act_window">
+        <field name="name">Asignacion Extra</field>
+        <field name="res_model">hr.asignacion.horas.extra</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_asigncion_horas_extra_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_asignacion_horas_extras"
+        name="Asignacion Horas Extra"
+        action="hr_asignacion_horas_extra_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="15"
+    />
+
+    <record id="hr_horas_extra_tree" model="ir.ui.view">
+        <field name="name">hr.horas.extra.tree</field>
+        <field name="model">hr.horas.extra</field>
+        <field name="arch" type="xml">
+            <tree string="Horas Extra" editable="top">
+                <field name="fecha_asignada"/>
+                <field name="monto"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_horas_extras_action" model="ir.actions.act_window">
+        <field name="name">Horas Extra</field>
+        <field name="res_model">hr.horas.extra</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_horas_extra_tree"/>
+    </record>
+
+<!--     <menuitem
+        id="menu_hr_horas_extras"
+        name="Horas Extra"
+        action="hr_horas_extras_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="12"
+    /> -->
+
+
+    <record id="hr_asigncion_facturas_presentadas_tree" model="ir.ui.view">
+        <field name="name">hr.asignacion.facturas.presentadas.tree</field>
+        <field name="model">hr.asignacion.facturas.presentadas</field>
+        <field name="arch" type="xml">
+            <tree string="Asignacion Facturas presentadas" editable="top">
+                <field name="employee"/>
+                <field name="company_id"/>
+                <field name="fecha"/>
+                <field name="monto"/>
+                <field name="nota"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_asignacion_facturas_presentadas_action" model="ir.actions.act_window">
+        <field name="name">Facturas presentadas</field>
+        <field name="res_model">hr.asignacion.facturas.presentadas</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_asigncion_facturas_presentadas_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_asignacion_facturas_presentadas"
+        name="Asignacion Facturas Presentadas"
+        action="hr_asignacion_facturas_presentadas_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="15"
+    />
+
+
+    <record id="hr_asignacion_saldo_favor_dependiente_tree" model="ir.ui.view">
+        <field name="name">hr.asignacion.saldo.favor.dependiente.tree</field>
+        <field name="model">hr.asignacion.saldo.favor.dependiente</field>
+        <field name="arch" type="xml">
+            <tree string="Asignacion Saldo a Favor Dependiente" editable="top">
+                <field name="employee"/>
+                <field name="company_id"/>
+                <field name="fecha"/>
+                <field name="monto"/>
+                <field name="nota"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_asignacion_saldo_favor_dependiente_action" model="ir.actions.act_window">
+        <field name="name">Asignacion Saldo a Favor Dependiente</field>
+        <field name="res_model">hr.asignacion.saldo.favor.dependiente</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_asignacion_saldo_favor_dependiente_tree"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_asignacion_saldo_favor_dependiente"
+        name="Asignacion Saldo a Favor Dependiente"
+        action="hr_asignacion_saldo_favor_dependiente_action"
+        parent="acoim_planillas_enterprise_base.menu_hr_payroll_rrhh_root"
+        sequence="16"
+    />
+</odoo>
