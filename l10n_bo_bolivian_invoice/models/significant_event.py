@@ -264,7 +264,7 @@ class SignificantEvent(models.Model):
             if STABLE_COMUNICATION:
                 self.write({'cufd' : self.pos_id.getCufd(actual = True)})
                 self.soap_service('registroEventoSignificativo')
-                if self.codeRecepcion: # from_pos and 
+                if self.codeRecepcion and from_pos: 
                     package_id = self.env['l10n.bo.package'].create({'name' : fields.datetime.now(), 'pos_id' : self.pos_id.id, 'event_id': self.id})
                     if package_id:
                         package_id.prepare_packages()

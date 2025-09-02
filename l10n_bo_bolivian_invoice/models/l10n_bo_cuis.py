@@ -72,11 +72,11 @@ class l10nBoCuis(models.Model):
     )
     
     
-    service_type = fields.Char(
-        string='Tipo servicio',
-        default='FacturacionCodigos',
-        readonly=True 
-    )
+    # service_type = fields.Char(
+    #     string='Tipo servicio',
+    #     default='FacturacionCodigos',
+    #     readonly=True 
+    # )
 
     
     error = fields.Char(
@@ -98,15 +98,7 @@ class l10nBoCuis(models.Model):
             
         
     def soap_service(self, METHOD = None):
-        PARAMS = [
-                ('service_type','=',self.service_type),
-                ('name','=',METHOD),
-                ('environment_type','=', self.pos_id.company_id.getL10nBoCodeEnvironment())
-            ]
-        _logger.info(f"Parametros de busqueda del servicio {METHOD}:{PARAMS}")
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(
-            PARAMS,limit=1
-        )
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].soap_service(METHOD, self.pos_id.company_id.getL10nBoCodeEnvironment(), SERVICE_TYPE='FacturacionCodigos')
         if WSDL_SERVICE:
             WSDL_RESPONSE = getattr(self, METHOD)(WSDL_SERVICE)
             return WSDL_RESPONSE
@@ -114,20 +106,20 @@ class l10nBoCuis(models.Model):
         raise UserError(f'Servicio: {METHOD} no encontrado')
     
 
-    def verificarComunicacion(self, WSDL_SERVICE):
-        WSDL = WSDL_SERVICE.getWsdl()
-        TOKEN = self.pos_id.company_id.getDelegateToken()
-        response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, {},  'verificarComunicacion')
-        _logger.info(f"{response}")
-        if response.get('success', False):
-            res_data = response.get('data')
-            if res_data.transaccion:
-                for obs in res_data.mensajesList:
-                    if obs.codigo == 926:
-                        return True
-            return False
-        else:
-                return False
+    # def verificarComunicacion(self, WSDL_SERVICE):
+    #     WSDL = WSDL_SERVICE.getWsdl()
+    #     TOKEN = self.pos_id.company_id.getDelegateToken()
+    #     response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, {},  'verificarComunicacion')
+    #     _logger.info(f"{response}")
+    #     if response.get('success', False):
+    #         res_data = response.get('data')
+    #         if res_data.transaccion:
+    #             for obs in res_data.mensajesList:
+    #                 if obs.codigo == 926:
+    #                     return True
+    #         return False
+    #     else:
+    #             return False
     
     def cuis(self, WSDL_SERVICE):
         PARAMS = {
@@ -139,12 +131,10 @@ class l10nBoCuis(models.Model):
             'codigoPuntoVenta'  : self.pos_id.getCode()
         }
 
-        _logger.info(f"Parametros de cuis: {PARAMS}")
         OBJECT = {'SolicitudCuis' : PARAMS}
 
-        WSDL =  WSDL_SERVICE.getWsdl()
         TOKEN = self.pos_id.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'cuis')
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
         self.prepare_wsdl_reponse(WSDL_RESPONSE)
     
     

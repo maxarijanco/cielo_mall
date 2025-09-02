@@ -9,6 +9,7 @@ from pytz import timezone, utc
 _logger = logging.getLogger(__name__)
 
 
+
 class CatalogRequest(models.Model):
     _name = 'l10n.bo.catalog.request'
     _description = 'Solicitud de catalogos'
@@ -545,6 +546,7 @@ class L10nBoActivityDocumentSector(models.Model):
         compute='_compute_name'
     )
     
+    
     @api.depends('codigoActividad', 'codigoDocumentoSector', 'tipoDocumentoSector')
     def _compute_name(self):
         for leg in self:
@@ -553,6 +555,30 @@ class L10nBoActivityDocumentSector(models.Model):
 
     def getCode(self):
         return self.codigoDocumentoSector
+    
+    def getServiceType(self):    
+        if self.getCode() == 1:
+            return 'ServicioFacturacionCompraVenta'
+        elif self.getCode() in [24, 47]:
+            return 'ServicioFacturacionDocumentoAjuste'
+        
+        # elif self.getCode() in [6, 8,14,17,16]:
+        #     if self.company_id.getL10nBoCodeModality() == '1':
+        #         return 'ServicioFacturacionElectronica'
+        #     elif self.company_id.getL10nBoCodeModality() == '2':
+        #         return 'ServicioFacturacionComputarizada'
+        
+        return False
+    
+    def requiredModality(self):
+        return []
+    
+    def getModalityType(self):
+        if self.getCode() in self.requiredModality():
+            return self.company_id.getL10nBoCodeModality()
+        return False
+    
+    
 
     def create_records(self, res, company_id = None):
         if not company_id:
@@ -1278,8 +1304,24 @@ class L10nLatamDocumentType(models.Model):
         string='Activo',
         company_dependent=True,
     )
+
+    def getServiceType(self):
+        return self.sector_document_id.getServiceType()
+    
+    def getModalityType(self):
+        return self.sector_document_id.getModalityType()
+    
+    def getReceptionMethod(self):
+        return self.invoice_type_id.getReceptionMethod()
+    
+    def getVerificationMethod(self):
+        return self.invoice_type_id.getVerificationMethod()
     
     
+
+    
+
+
     def getCode(self):
         return self.codigoClasificador
     
@@ -1822,7 +1864,51 @@ class TypeInvoice(models.Model):
     def getCode(self):
         return self.codigoClasificador
     
-    
+    def getReceptionMethod(self):
+        if self.codigoClasificador in [1,2]:
+            return 'recepcionFactura'
+        if self.codigoClasificador == 3:
+            return 'recepcionDocumentoAjuste'
+        
+        if self.codigoClasificador == 4:
+            raise UserError('La recepcion de documentos equivalentes no esta implementado')
+        
+    def getVerificationMethod(self):
+        if self.codigoClasificador in [1,2]:
+            return 'verificacionEstadoFactura'
+        if self.codigoClasificador == 3:
+            return 'verificacionEstadoDocumentoAjuste'
+        
+        if self.codigoClasificador == 4:
+            raise UserError('La recepcion de documentos equivalentes no esta implementado')
+        
+
+    def getObjectName(self, method):
+        if method == 'recepcionFactura':
+            return 'SolicitudServicioRecepcionFactura'
+        if method == 'recepcionDocumentoAjuste':
+            return 'SolicitudServicioRecepcionDocumentoAjuste'
+        
+        if method == 'verificacionEstadoFactura':
+            return 'SolicitudServicioVerificacionEstadoFactura'
+        if method == 'verificacionEstadoDocumentoAjuste':
+            return 'SolicitudServicioVerificacionEstadoDocumentoAjuste'
+        
+        raise UserError(f'No se encontro un nombre de objeto para el metodo: {method}')
+        
+        # if method == 'recepcionDocumentoAjuste':
+        #     return 'SolicitudServicioRecepcionDocumentoAjuste'
+        # if method == 'recepcionDocumentoAjuste':
+        #     return 'SolicitudServicioRecepcionDocumentoAjuste'
+        # if method == 'recepcionDocumentoAjuste':
+        #     return 'SolicitudServicioRecepcionDocumentoAjuste'
+        # if method == 'recepcionDocumentoAjuste':
+        #     return 'SolicitudServicioRecepcionDocumentoAjuste'
+        
+
+        
+        
+
     
 
     name = fields.Char(
@@ -1851,6 +1937,7 @@ class TypeInvoice(models.Model):
     
     def _format(self):
         pass
+
 
 
 class TypeUnitMeasurement(models.Model):
@@ -1911,6 +1998,9 @@ class TypeUnitMeasurement(models.Model):
     
     def getCode(self):
         return self.codigoClasificador
+    
+    def getDescription(self):
+        return self.descripcion
 
     def create_records(self, res, company_id = None):
         for activity in res.listaCodigos:

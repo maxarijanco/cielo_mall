@@ -20,11 +20,11 @@ class AccountMove(models.Model):
     def action_reversion(self):
         if not self.reversion:
             SERVICE_TYPE = self.getServiceType()
-            MODALITY_TYPE = None
+            MODALITY_TYPE = self.getModalityType()
                     
-            if self.document_type_id.name.getCode() in [3]:
-                        #SERVICE_TYPE = 'ServicioFacturacionElectronica'
-                        MODALITY_TYPE = self.company_id.getL10nBoCodeModality()
+            # if self.document_type_id.name.getCode() in [3]:
+            #             #SERVICE_TYPE = 'ServicioFacturacionElectronica'
+            #             MODALITY_TYPE = self.company_id.getL10nBoCodeModality()
                     
             if self.move_type == 'out_invoice':
                 WSDL_RESPONSE = self.soap_service(METHOD='reversionAnulacionFactura', SERVICE_TYPE= SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
@@ -47,14 +47,13 @@ class AccountMove(models.Model):
         WSDL = WSDL_SERVICE.getWsdl()
         _logger.info(f"Parametros revercion : {_params}, WSDL: {WSDL}")
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, _params, 'reversionAnulacionFactura')
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, _params)
         return WSDL_RESPONSE
 
     def reversionAnulacionDocumentoAjuste(self, WSDL_SERVICE):
         _params = self._prepare_invoice_reversion_params_soap()
-        WSDL = WSDL_SERVICE.getWsdl()
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, _params, 'reversionAnulacionDocumentoAjuste')
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, _params)
         return WSDL_RESPONSE
          
 

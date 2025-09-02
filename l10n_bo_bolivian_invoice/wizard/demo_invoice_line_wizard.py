@@ -50,7 +50,14 @@ class DemoInvoiceLineWizard(models.TransientModel):
     
     confirm = fields.Boolean(
         string='Publicar automatico',
+        default=True
     )
+
+    
+    discounting = fields.Boolean(
+        string='Aplicar descuento',
+    )
+    
     
     
     @api.model
@@ -110,7 +117,7 @@ class DemoInvoiceLineWizard(models.TransientModel):
 
     def docParams(self, ARGS, to_continue):
             
-            if self.document_type.getCode() in [1,8,13,14]:
+            if self.document_type.getCode() in [1,8,13,14,17,48]:
                 to_continue = True
             
             elif self.document_type.getCode() == 2:
@@ -138,6 +145,9 @@ class DemoInvoiceLineWizard(models.TransientModel):
                 ARGS['contact_id'] = self.getDefaultContact().id
                 to_continue = True
             
+           
+            
+
             elif self.document_type.getCode() == 28:
                 ARGS['country_id'] = self.getCountry().id
                 ARGS['destination_address'] = 'Portachuelo'
@@ -153,11 +163,11 @@ class DemoInvoiceLineWizard(models.TransientModel):
                 ARGS = self.getGeneralParams(date_time_now)
             else:
                 ARGS = [
-                    ('partner_id','=', self.demo_invoice_id.partner_id.id),
+                    #('partner_id','=', self.demo_invoice_id.partner_id.id),
                     ('move_type','=','out_invoice'),
                     ('branch_office_id','=', self.pos_id.branch_office_id.id),
                     ('pos_id','=', self.pos_id.id),
-                    ('document_type_id.codigoClasificador','in', [1,2,11]),
+                    ('invoice_type_code','in', [1]),
                     ('journal_id','=', self.demo_invoice_id.journal_id.id),
                     ('reversion','=',False),
                     ('state','=','posted'),
@@ -178,6 +188,20 @@ class DemoInvoiceLineWizard(models.TransientModel):
                         _logger.info('Creando lineas de facturas')
                         self.generate_line_ids(invoice_ids)
                         _logger.info('Publicando Facturas')
+
+                        if self.discounting:
+                            for mv in invoice_ids:
+                                disc = self.env['global.discount'].create(
+                                    {
+                                        'account_move_id' : mv.id,
+                                        'discount_type' : 'discount',
+                                        'type' : 'percentage',
+                                        'percentage' : 50
+                                    }
+                                )
+                                disc._check_percentage()
+                                disc.discounting()
+
                         invoice_ids._post(soft = True)
                         #if self.confirm:
                         #    for invoice_id in invoice_ids:
@@ -188,7 +212,7 @@ class DemoInvoiceLineWizard(models.TransientModel):
                         _IDS = []
                         account_reversion_id = self.env['account.move.reversal'].create(
                             {
-                                'date_mode' : 'custom',
+                                #'date_mode' : 'custom',
                                 'journal_id' : self.demo_invoice_id.journal_id.id,
                                 'date' : fields.datetime.now(),
                                 'move_ids': [(6,0,invoice_ids.ids)]
@@ -197,7 +221,10 @@ class DemoInvoiceLineWizard(models.TransientModel):
                         #raise UserError(account_reversion_id)
                         if account_reversion_id:
                             #raise UserError('Reversion creada')
-                            account_reversion_id.reverse_moves()
+                            account_reversion_id.reverse_moves(True)
+                            for new_mv in account_reversion_id.new_move_ids:
+                                new_mv.document_type_id = self.get_document_type_id()
+                            account_reversion_id.new_move_ids._post(soft = True)
             else:
                 raise UserError(f"Hay tiene una implementacion para el documento: {self.document_type.name}")
         else:
@@ -213,6 +240,10 @@ class DemoInvoiceLineWizard(models.TransientModel):
             if self.document_type.getCode() in [3,4]:
                 if not self.product_id.siat_service_nandina_id:
                     raise UserError(f"No se encontro un codigo nandina para el producto: {self.product_id.name}")
+                
+            if self.document_type.getCode() == 17:
+                ARGS['doctor_id'] = invoice_id.partner_id.id
+                ARGS['room_number'] = 1
                 
 
             self.env['account.move.line'].create(

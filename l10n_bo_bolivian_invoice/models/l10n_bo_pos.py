@@ -26,6 +26,16 @@ class L10nBoPos(models.Model):
         copy=False
     )
 
+    def generateCuis(self):
+        self.cuis_id = self.env['l10n.bo.cuis'].create({'pos_id' : self.id}).id
+    
+    
+    def generateCufd(self):
+        new_cufd_id = self.env['l10n.bo.cufd'].create({'pos_id' : self.id})
+        if not self.cufd_id:
+            self.cufd_id = new_cufd_id.id
+        return new_cufd_id
+
     @api.model
     def create(self, vals):
         
@@ -39,13 +49,9 @@ class L10nBoPos(models.Model):
             raise ValidationError('No puede crear un punto de venta desde otra compañia, cambie de entorno de compañia.')
         
         
-        res.write(
-            {
-                'name': f'Punto de venta {res.code}', 
-                'cuis_id' : self.env['l10n.bo.cuis'].create({'pos_id' : res.id}).id,
-                'cufd_id' : self.env['l10n.bo.cufd'].create({'pos_id' : res.id}).id
-            }
-        )
+        res.name = f'Punto de venta {res.code}'
+        res.generateCuis()
+        res.generateCufd()
         return res
         
     
@@ -194,15 +200,19 @@ class L10nBoPos(models.Model):
     
     # CUIS METHODS
     def cuis_request(self, massive = False):
+        connection = True
         if not massive:
-            if self.verificarComunicacion():
-                self.ensure_one()
-                if self.cuis_id:
-                    self.cuis_id.soap_service('cuis')
-        else:
+            connection = self.soap_service(METHOD='verificarComunicacion')
+
+        if connection:
             self.ensure_one()
-            if self.cuis_id:
-                self.cuis_id.soap_service('cuis')
+            if not self.cuis_id:
+                self.generateCuis()
+            self.cuis_id.soap_service('cuis')
+        else:
+            return  self.showMessage('Coneccion fallida','No se tiene coneccion con la base de datos del SIAT') 
+    
+    
 
     
     messagesList = fields.Many2many(
@@ -241,37 +251,25 @@ class L10nBoPos(models.Model):
     def getEmisionCode(self):
         if self.emision_id:
             return self.emision_id.getCode()
-        return False
+        return False # ->0
         
     def button_update_cufd(self):
         self.cufd_request()
     
 
     def cufd_request(self, massive = False):
+        connection = True
         if not massive:
-            if self.verificarComunicacion(SERVICE_TYPE='FacturacionCodigos') and self.emision_id and self.emision_id.getCode() == 1:    
-                
-                new_cufd_id = self.env['l10n.bo.cufd'].create({'pos_id' : self.id})
+            connection = self.soap_service(METHOD='verificarComunicacion')
+            
+        if connection:
+            if self.cuis_id and self.getEmisionCode() == 1:
+                new_cufd_id = self.generateCufd()
                 if new_cufd_id:
                     new_cufd_id.soap_service('cufd')
                     self.write({ 'messagesList': new_cufd_id.messagesList})
-                    if new_cufd_id.getCode()!= '000':
-                        self.write({'cufd_id' : new_cufd_id.id})
-                    else:
-                        new_cufd_id.unlink()
-                    
-                    
-                if len(self.cufd_ids) > self.limit_cufds:
-                    self.old_cufd_delete()
-
-        else:
-            if self.cuis_id and self.emision_id and self.emision_id.getCode() == 1:
-                new_cufd_id = self.env['l10n.bo.cufd'].create({'pos_id' : self.id})
-                if new_cufd_id:
-                    new_cufd_id.soap_service('cufd')
-                    self.write({ 'messagesList': new_cufd_id.messagesList})
-                    if new_cufd_id.getCode()!= '000':
-                        self.write({'cufd_id' : new_cufd_id.id})
+                    if new_cufd_id.getCode() != '000':
+                        self.cufd_id = new_cufd_id.id
                     else:
                         new_cufd_id.unlink()
                 if len(self.cufd_ids) > self.limit_cufds:
@@ -304,40 +302,20 @@ class L10nBoPos(models.Model):
         
 
 
-    def verificarComunicacion(self, SERVICE_TYPE = 'FacturacionOperaciones'):
-        METHOD = 'verificarComunicacion'
-        PARAMS = [
-                ('service_type','=',SERVICE_TYPE),
-                ('name','=',METHOD),
-                ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
-            ]
-        _logger.info(f"Parametros de busqueda del servicio {METHOD}:{PARAMS}")
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(
-            PARAMS,limit=1
-        )
-        if WSDL_SERVICE:
-            WSDL = WSDL_SERVICE.getWsdl()
-            TOKEN = self.company_id.getDelegateToken()
-            response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, {},  METHOD)
-            _logger.info(f"{response}")
-            if response.get('success', False):
-                res_data = response.get('data')
-                if res_data.transaccion:
-                    for obs in res_data.mensajesList:
-                        if obs.codigo == 926:
-                            return True
-                return False
-            else:
-                    return False
 
-        raise UserError(f'Servicio: {METHOD} no encontrado')
-        #response = self.cuis_id.soap_service(METHOD)
-        #_logger.info(f"{response}")
-        #return response
-
+    def verificarComunicacion(self, WSDL_SERVICE):
+        #WSDL = WSDL_SERVICE.getWsdl()
+        response = WSDL_SERVICE.process_soap_siat(token = self.company_id.getDelegateToken())
+        if response.get('success', False):
+            res_data = response.get('data')
+            if res_data.transaccion:
+                return True
+        return False
+        
     
     def test_siat_connection(self):
-        if self.verificarComunicacion():
+        connection = self.soap_service(METHOD='verificarComunicacion')
+        if connection:
             return self.showMessage('Coneccion exitosa','Coneccion exitosa con el SIAT')
         return  self.showMessage('Coneccion fallida','No se tiene coneccion con la base de datos del SIAT') 
     
@@ -363,15 +341,8 @@ class L10nBoPos(models.Model):
     )
     
 
-    def soap_service(self, METHOD = None, SERVICE_TYPE = None):
-        PARAMS = [
-                ('name','=',METHOD),
-                ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
-        ]
-        if SERVICE_TYPE:
-            PARAMS.append(('service_type','=', SERVICE_TYPE))
-
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+    def soap_service(self, METHOD):
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].soap_service(METHOD, self.company_id.getL10nBoCodeEnvironment())
         if WSDL_SERVICE:
             return getattr(self, METHOD)(WSDL_SERVICE)
         raise UserError(f'Servicio: {METHOD} no encontrado')

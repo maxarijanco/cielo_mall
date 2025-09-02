@@ -184,9 +184,6 @@
                         </tr>
                     <tbody>
                         <t t-foreach="o.invoice_line_ids" t-as="line">
-                        <t t-set="numeric_amount">
-                            <t t-esc="line.getSubTotal_t2_47()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
-                        </t>
                         <tr t-if="line.display_type == 'product'and line.product_id.gif_product == False" > 
                             <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.getItemNumber()"/></td> 
                             <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.product_id.default_code"/></td> 
@@ -194,8 +191,8 @@
                             <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.product_uom_id.siat_udm_id.descripcion"/></td> 
                             <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.name"/></td> 
                             <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getPriceUnit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /></td> 
-                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getAmountDiscount_t2_47()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /></td> 
-                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="numeric_amount"/></td> 
+                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getAmountDiscount()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /></td> 
+                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getSubTotal()"/></td> 
                         </tr>
                         
                         </t>
@@ -208,21 +205,21 @@
                             <tr>
                                 <td rowspan="4" style="width:600px; vertical-align: middle; font-size: 12px;"><b>Son: <span t-esc="o.getBolivianLiteral47()"/> Bolivianos</b></td>
                                 <td style="text-align: right; padding-right:10px; border: 1px solid black;"><b>SUBTOTAL</b></td>
-                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountSubtotal47()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountSubTotal()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
                             </tr>
                             
                             <tr>
                                 <td style="text-align: right; padding-right:10px; border: 1px solid black;"><b>MONTO DESCUENTO DEBITO CREDITO</b></td>
-                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountTotalProrated()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountDiscountCreditDebit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
                             </tr>
                             
                             <tr>
                                 <td style=" width:250px; text-align: right; padding-right:10px; border: 1px solid black;"><b>MONTO TOTAL DEVUELTO Bs</b></td>
-                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountTotalReturned47()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountTotalReturned()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
                             </tr>
                             <tr>
                                 <td style="text-align: right; padding-right:10px; border: 1px solid black;"><b>MONTO EFECTIVO DÉBITO-CRÉDITO Bs</b></td>
-                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountEffective47()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountEffective()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
                             </tr>
                         </table>
                             

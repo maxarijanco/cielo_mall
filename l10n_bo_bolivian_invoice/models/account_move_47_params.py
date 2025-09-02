@@ -29,7 +29,7 @@ class AccountMove47Params(models.Model):
         cabecera += f"""<codigoTipoDocumentoIdentidad>{self.partner_id.getIdentificationCode()}</codigoTipoDocumentoIdentidad>"""
         cabecera += f"""<numeroDocumento>{self.partner_id.getNit()}</numeroDocumento>"""
         cabecera += f"""<complemento>{self.partner_id.getComplement()}</complemento>""" if self.partner_id.complement else """<complemento xsi:nil="true"/>"""
-        cabecera += f"""<codigoCliente>{self.partner_id.vat}</codigoCliente>"""
+        cabecera += f"""<codigoCliente>{self.getPartnerCode()}</codigoCliente>"""
         cabecera += f"""<numeroFactura>{self.getOriginalInvoiceNumber()}</numeroFactura>"""
         cabecera += f"""<numeroAutorizacionCuf>{self.getOriginalCuf()}</numeroAutorizacionCuf>"""
         cabecera += f"""<fechaEmisionFactura>{self.getOriginalInvoiceDate()}</fechaEmisionFactura>"""
@@ -37,12 +37,9 @@ class AccountMove47Params(models.Model):
         
         cabecera += f"""<descuentoAdicional>{self.reversed_entry_id.getAmountDiscount()}</descuentoAdicional>"""  if self.reversed_entry_id.getAmountDiscount()>0 else """<descuentoAdicional xsi:nil="true"/>"""
         
-        cabecera += f"""<montoTotalDevuelto>{self.getAmountTotalReturned47()}</montoTotalDevuelto>"""
-        #cabecera += f"""<montoTotalDevuelto>1000</montoTotalDevuelto>"""
-        cabecera += f"""<montoDescuentoCreditoDebito>{self.getAmountTotalProrated()}</montoDescuentoCreditoDebito>""" if self.getAmountTotalProrated() > 0 else """<montoDescuentoCreditoDebito xsi:nil="true"/>"""
-        #cabecera += f"""<montoDescuentoCreditoDebito>500</montoDescuentoCreditoDebito>"""
-        cabecera += f"""<montoEfectivoCreditoDebito>{self.getAmountEffective47()}</montoEfectivoCreditoDebito>"""
-        #cabecera += f"""<montoEfectivoCreditoDebito>130</montoEfectivoCreditoDebito>"""
+        cabecera += f"""<montoTotalDevuelto>{self.getAmountTotalReturned()}</montoTotalDevuelto>"""
+        cabecera += f"""<montoDescuentoCreditoDebito>{self.getAmountDiscountCreditDebit()}</montoDescuentoCreditoDebito>""" if self.getAmountDiscountCreditDebit() > 0 else """<montoDescuentoCreditoDebito xsi:nil="true"/>"""
+        cabecera += f"""<montoEfectivoCreditoDebito>{self.getAmountEffective()}</montoEfectivoCreditoDebito>"""
         cabecera += f"""<codigoExcepcion>{1 if self.force_send else 0}</codigoExcepcion>"""
         cabecera += f"""<leyenda>{self.getLegend()}</leyenda>"""
         cabecera += f"""<usuario>{self.user_id.name}</usuario>"""
@@ -52,42 +49,40 @@ class AccountMove47Params(models.Model):
         detalle  = """"""
         
         
-        for line in self.reversed_entry_id.invoice_line_ids:
-            if line.display_type == 'product' and not line.product_id.gif_product:
-                detalle  += """<detalle>"""
-                detalle += f"""<nroItem>{line.getItemNumber()}</nroItem>"""
+        for line in self.reversed_entry_id.get_invoice_lines():
+            detalle  += """<detalle>"""
+            detalle += f"""<nroItem>{line.getItemNumber()}</nroItem>"""
 
-                detalle += f"""<actividadEconomica>{line.product_id.getAe()}</actividadEconomica>"""
-                detalle += f"""<codigoProductoSin>{line.product_id.getServiceCode()}</codigoProductoSin>"""
-                detalle += f"""<codigoProducto>{line.product_id.getCode(to_xml =True)}</codigoProducto>"""
-                detalle += f"""<descripcion>{line.getDescription(to_xml =True)}</descripcion>"""
-                detalle += f"""<cantidad>{round(line.quantity,2)}</cantidad>"""
-                detalle += f"""<unidadMedida>{line.product_uom_id.getCode()}</unidadMedida>"""
-                detalle += f"""<precioUnitario>{line.getPriceUnit()}</precioUnitario>"""
-                detalle += f"""<montoDescuento>{line.getAmountDiscount()}</montoDescuento>""" if line.getAmountDiscount() > 0 else """<montoDescuento xsi:nil="true"/>"""
-                detalle += f"""<subTotal>{line.getSubTotal()}</subTotal>"""
-                detalle += f"""<codigoDetalleTransaccion>1</codigoDetalleTransaccion>"""
-                detalle += """</detalle>"""
+            detalle += f"""<actividadEconomica>{line.product_id.getAe()}</actividadEconomica>"""
+            detalle += f"""<codigoProductoSin>{line.product_id.getServiceCode()}</codigoProductoSin>"""
+            detalle += f"""<codigoProducto>{line.product_id.getCode(to_xml =True)}</codigoProducto>"""
+            detalle += f"""<descripcion>{line.getDescription(to_xml =True)}</descripcion>"""
+            detalle += f"""<cantidad>{round(line.quantity,2)}</cantidad>"""
+            detalle += f"""<unidadMedida>{line.product_uom_id.getCode()}</unidadMedida>"""
+            detalle += f"""<precioUnitario>{line.getPriceUnit()}</precioUnitario>"""
+            detalle += f"""<montoDescuento>{line.getAmountDiscount()}</montoDescuento>""" if line.getAmountDiscount() > 0 else """<montoDescuento xsi:nil="true"/>"""
+            detalle += f"""<subTotal>{line.getSubTotal()}</subTotal>"""
+            detalle += f"""<codigoDetalleTransaccion>1</codigoDetalleTransaccion>"""
+            detalle += """</detalle>"""
         
         
-        for line in self.invoice_line_ids:
-            if line.display_type == 'product' and not line.product_id.gif_product:
-                detalle  += """<detalle>"""
-                detalle += f"""<nroItem>{line.getItemNumber()}</nroItem>"""
-                
-                detalle += f"""<actividadEconomica>{line.product_id.getAe()}</actividadEconomica>"""
-                detalle += f"""<codigoProductoSin>{line.product_id.getServiceCode()}</codigoProductoSin>"""
-                detalle += f"""<codigoProducto>{line.product_id.getCode(to_xml =True)}</codigoProducto>"""
-                detalle += f"""<descripcion>{line.getDescription(to_xml =True)}</descripcion>"""
-                detalle += f"""<cantidad>{round(line.quantity,2)}</cantidad>"""
-                detalle += f"""<unidadMedida>{line.product_uom_id.getCode()}</unidadMedida>"""
-                detalle += f"""<precioUnitario>{line.getPriceUnit()}</precioUnitario>"""
-                #detalle += f"""<montoDescuento>{line.getAmountDiscount()}</montoDescuento>""" if line.getAmountDiscount() > 0 else """<montoDescuento xsi:nil="true"/>"""
-                detalle += f"""<montoDescuento>{line.getAmountDiscount_t2_47()}</montoDescuento>""" if line.getAmountDiscount_t2_47() > 0 else """<montoDescuento xsi:nil="true"/>"""
-                
-                detalle += f"""<subTotal>{line.getSubTotal_t2_47()}</subTotal>"""
-                detalle += f"""<codigoDetalleTransaccion>2</codigoDetalleTransaccion>"""
-                detalle += """</detalle>"""
+        for line in self.get_invoice_lines():
+            detalle  += """<detalle>"""
+            detalle += f"""<nroItem>{line.getItemNumber()}</nroItem>"""
+            
+            detalle += f"""<actividadEconomica>{line.product_id.getAe()}</actividadEconomica>"""
+            detalle += f"""<codigoProductoSin>{line.product_id.getServiceCode()}</codigoProductoSin>"""
+            detalle += f"""<codigoProducto>{line.product_id.getCode(to_xml =True)}</codigoProducto>"""
+            detalle += f"""<descripcion>{line.getDescription(to_xml =True)}</descripcion>"""
+            detalle += f"""<cantidad>{round(line.quantity,2)}</cantidad>"""
+            detalle += f"""<unidadMedida>{line.product_uom_id.getCode()}</unidadMedida>"""
+            detalle += f"""<precioUnitario>{line.getPriceUnit()}</precioUnitario>"""
+            #detalle += f"""<montoDescuento>{line.getAmountDiscount()}</montoDescuento>""" if line.getAmountDiscount() > 0 else """<montoDescuento xsi:nil="true"/>"""
+            detalle += f"""<montoDescuento>{line.getAmountDiscount()}</montoDescuento>""" if line.getAmountDiscount() > 0 else """<montoDescuento xsi:nil="true"/>"""
+            
+            detalle += f"""<subTotal>{line.getSubTotal()}</subTotal>"""
+            detalle += f"""<codigoDetalleTransaccion>2</codigoDetalleTransaccion>"""
+            detalle += """</detalle>"""
         return cabecera + detalle
 
         
@@ -115,17 +110,14 @@ class AccountMove47Params(models.Model):
         amount = self.getOriginalAmount47() - self.reversed_entry_id.getAmountDiscount()
         return round(amount, 2)
     
-    def getAmountTotalProrated(self):
-        amount = 0
-        for line in self.invoice_line_ids:
-            if line.display_type == 'product' and not line.product_id.gif_product and line.item_number > 0:
-                amount += self.reversed_entry_id.getAmountProrated47(line.item_number)
+    def getAmountDiscountCreditDebit(self):
+        amount = self.AmountProrated() # + self.amountDiscount()
         _logger.info(f'Suma total prorrateado: {amount}')
         #amount *= self.currency_id.getExchangeRate()
         return self.roundingUp(amount, self.decimalbo())
 
     def getAmountProrated47(self, item):
-        for line in self.invoice_line_ids:
+        for line in self.invoice_line_ids():
             if line.item_number == item:
                 #raise UserError(f"PRORRATEADO: {line.prorated_line_discount}, DESCUENTO: {line.getAmountDiscount()}")
                 return self.roundingUp(line.get_prorated_line_discount() - line.getAmountDiscount(), self.decimallinebo())
@@ -136,25 +128,23 @@ class AccountMove47Params(models.Model):
         #raise UserError(amount)
         return amount
     
-    def getAmountSubtotal47(self):
-        amount_subtotal = 0
-        for line in self.invoice_line_ids:
-                if line.display_type == 'product' and not line.product_id.gif_product:
-                    amount_subtotal += line.getSubTotal_t2_47()
-        return self.roundingUp(amount_subtotal, self.decimalbo())
-            
-
-    def getAmountTotalReturned47(self):
-        #raise UserError(f'SUBTOTAL:{self.getAmountSubtotal47()}, - PRORRATEADO:{self.getAmountTotalProrated()}, DECIMALES: {self.decimalbo()}')
-        return self.roundingUp(self.getAmountSubtotal47() - self.getAmountTotalProrated(), self.decimalbo())
+    # def getAmountSubtotal47(self):
+    #     amount_subtotal = 0
+    #     for line in self.get_invoice_lines():
+    #         amount_subtotal += line.getSubTotal() #line.getSubTotal_t2_47()
+    #     return self.roundingUp(amount_subtotal, self.decimalbo())
     
-    def getAmountEffective47(self):
-        return self.roundingUp(self.getAmountTotalReturned47() * 0.13, self.decimalbo())
+
+    def getAmountTotalReturned(self):
+        return self.roundingUp(self.getAmountTotal() , self.decimalbo())
+    
+    # def getAmountEffective47(self):
+    #     return self.roundingUp(self.getAmountTotalReturned() * 0.13, self.decimalbo())
     
 
     def getBolivianLiteral47(self):
            
-        amount_total = self.getAmountTotalReturned47() # * self.currency_id.getExchangeRate()
+        amount_total = self.getAmountTotalReturned() # * self.currency_id.getExchangeRate()
         
         if self.document_type_code in [14]:
             amount_total += self.getAmountSpecificIce() + self.getAmountPercentageIce()
@@ -187,33 +177,35 @@ class AccountMove47Params(models.Model):
         if self.reversed_entry_id and self.reversed_entry_id.document_type_id.getCode() == 1:
             if self.pos_id:
                 #self.write({'document_type_id' : self.get_credit_debit_ice_id()}) 
-                discount_lines = self.invoice_line_ids.filtered(lambda line: line.display_type == 'product' and line.product_id and line.product_id.global_discount)
-                if discount_lines:
-                    discount_lines.unlink()
-                    
-                    for line in self.invoice_line_ids:
-                        discount_line_id = self.env['line.discount'].create(
-                            {
-                                'name' : line.id,
-                                'type' : 'amount',
-                                'amount' : self.reversed_entry_id.getAmountProrated(line.getItemNumber())
-                            }
-                        )
-                        if discount_line_id:
-                            discount_line_id.discounting()
+                self.invoice_line_ids.filtered(lambda line: line.display_type == 'product' and line.product_id and line.product_id.global_discount).unlink()
+                for line in self.invoice_line_ids:
+                    line_reversed = self.reversed_entry_id.getItemLine(line.getItemNumber())
+                    line.line_reversed_id = line_reversed.id
 
+                    discount_line_id = self.env['line.discount'].create(
+                        {
+                            'name' : line.id,
+                            'type' : 'amount',
+                            'amount' : line_reversed.prorated_line_discount + line_reversed.get_discount_fix()  #self.reversed_entry_id.getAmountProrated(line.getItemNumber())
+                        }
+                    )
+
+                    
+                    if discount_line_id:
+                        discount_line_id.discounting()
+                    
 
 class AccountMoveLine(models.Model):
     _inherit = ['account.move.line']
     
 
-    def getAmountDiscount_t2_47(self):
-        parent_move_id = self.move_id.reversed_entry_id
-        amount = parent_move_id.getAmountLineDiscountItem(self.getItemNumber()) #.getAmountProrated() - self.getAmountDiscount()
-        #raise UserError(amount)
-        return amount
+    # def getAmountDiscount_t2_47(self):
+    #     parent_move_id = self.move_id.reversed_entry_id
+    #     amount = parent_move_id.getAmountLineDiscountItem(self.getItemNumber()) #.getAmountProrated() - self.getAmountDiscount()
+    #     #raise UserError(amount)
+    #     return amount
     
-    def getSubTotal_t2_47(self, decimal = 2):
-        amount = round( (self.quantity * self.getPriceUnit() ) - self.getAmountDiscount_t2_47() , decimal)
-        return  amount
+    # def getSubTotal_t2_47(self, decimal = 2):
+    #     amount = round( (self.quantity * self.getPriceUnit() ) - self.getAmountDiscount_t2_47() , decimal)
+    #     return  amount
     

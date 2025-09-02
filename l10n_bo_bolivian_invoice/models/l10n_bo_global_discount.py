@@ -165,21 +165,17 @@ class AccountMove(models.Model):
             }
         }
 
-    def getAmountDiscount(self, decimal = 2):
-        ld = self.invoice_line_ids.filtered(lambda l: l.product_id.global_discount and l.product_id.gif_product)
-        amount = 0
-        if not ld and self.amount_discount!=0:
-            self.write({'amount_discount' : 0.0})
-        elif ld:
-            for l in ld:
-                amount += l.quantity * l.price_unit
-        amount *= -1
-        if amount != 0:
-            self.write({'amount_discount' : amount})
+    def getAmountDiscount(self):
+        discount_lines = sum([ line.quantity * line.price_unit for line in self.invoice_line_ids if line.product_id.global_discount and line.product_id.gif_product ])
+        #discount_prorrata = sum([ line.prorated_line_discount for line in self.get_invoice_lines() ]) if self.move_type in ['out_refund'] else 0
+        amount = discount_lines * -1
+        #amount += discount_prorrata
+        self.amount_discount = amount 
+
         if self.document_type_id.getCode() not in [28]:
             amount*= self.currency_id.getExchangeRate()
             
-        return round(amount, self.decimalbo())
+        return self.roundingUp(amount, self.decimalbo())
     
 
     

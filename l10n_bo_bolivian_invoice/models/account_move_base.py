@@ -65,15 +65,27 @@ class AccountMove(models.Model):
         string='Punto de venta',
         comodel_name='l10n.bo.pos',
     )
+    
+    @api.constrains('pos_id')
+    def _check_pos_id(self):
+        for record in self:
+            if record.pos_id:
+                record.emision_type_id = record.pos_id.emision_id.id if record.pos_id.emision_id else False
+    
 
     
     emision_type_id = fields.Many2one(
         string='Tipo emisión',
         comodel_name='l10n.bo.type.emision',
-        related='pos_id.emision_id',
-        readonly=True,
-        store=True
     )
+
+    
+    emision_code = fields.Integer(
+        related='emision_type_id.codigoClasificador',
+        readonly=True,
+        store=True    
+    )
+    
     
     
     many_pos = fields.Boolean(
@@ -103,17 +115,17 @@ class AccountMove(models.Model):
 
     
     invoice_date_edi = fields.Datetime(
-        string='Fecha de la factura',
+        string='Fecha y hora (BO)',
         default=fields.Datetime.now,
         copy=False
     )
     
     
-    @api.constrains('invoice_date_edi')
-    def _check_invoice_date_edi(self):
-        for record in self:
-            if record.edi_bo_invoice and record.move_type in ['out_invoice','out_refund']:
-                record.write({'invoice_date' : fields.Date.context_today(self)})
+    # @api.constrains('invoice_date_edi')
+    # def _check_invoice_date_edi(self):
+    #     for record in self:
+    #         if record.edi_bo_invoice and record.move_type in ['out_invoice','out_refund']:
+    #             record.write({'invoice_date' : fields.Date.context_today(self)})
     
     # REVISAR METODO
     def get_formatted_datetime(self):
@@ -132,18 +144,37 @@ class AccountMove(models.Model):
     )
 
     
-
+    l10n_bo_document_type = fields.Many2one(
+        comodel_name='l10n.bo.document.type',
+        related='document_type_id.name',
+        readonly=True,
+        store=True
+    )
+    
     document_type_code = fields.Integer(
         string='Código de documento',
-        related='document_type_id.name.codigoClasificador',
+        related='l10n_bo_document_type.codigoClasificador',
         readonly=True,
         store=True   
     )
     
 
+    invoice_type_id = fields.Many2one(
+        comodel_name='l10n.bo.type.invoice',
+        related='l10n_bo_document_type.invoice_type_id',
+        readonly=True,
+        store=True
+        
+    )
+    
+    
+
+    
+
+
     invoice_type_code = fields.Integer(
-        string='Codigo tipo tipo documento',
-        related='document_type_id.name.invoice_type_id.codigoClasificador',
+        string='Codigo tipo factura',
+        related='invoice_type_id.codigoClasificador',
         readonly=True,
         store=True
         
@@ -335,13 +366,14 @@ class AccountMove(models.Model):
     
     
     
-    
+    # CAMPO A ELIMINAR
     cuf = fields.Char(
         string='CUF',
         help='Codigo unico de facturación.',
         copy=False,
     )
-
+    
+    # CAMPO A ELIMINAR
     edi_str = fields.Text(
         string='Formato edi',
         copy=False,
@@ -448,13 +480,6 @@ class AccountMove(models.Model):
     
     
     
-    def getAmountSubTotal(self):
-        amount_subtotal = 0
-        for line in self.invoice_line_ids:
-                if line.display_type == 'product' and not line.product_id.gif_product:
-                    amount_subtotal += line.getSubTotal()
-        return self.roundingUp(amount_subtotal, self.decimalbo())
-        
     
 
     def generate_qr(self):
@@ -528,3 +553,7 @@ class AccountMove(models.Model):
         comodel_name='l10n.bo.activity',
     )
     
+
+    def invisible_for_moves(self):
+        return super(AccountMove, self).invisible_for_moves() + ['out_invoice']
+        

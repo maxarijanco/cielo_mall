@@ -102,8 +102,12 @@
                         <page string="Facturas">
                             <field name="package_invoice_line_ids">
                                 <tree editable="bottom">
+                                    <field name="file_number"/>
                                     <field name="name"/>
                                     <field name="package_line_id"/>
+                                    
+                                    <field name="error" />
+                                    
                                 </tree>
                             </field>
                         </page>

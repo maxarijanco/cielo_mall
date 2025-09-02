@@ -38,24 +38,53 @@
         </template>
 
         <template id="logo_position_top">
-                <table class="table1" >
+            <div style="font-size:13px;">
+                <table style="border: 1px solid white">
+                    <tr>
+                        <td style="width:65%;">                                
+                            <table style="border: 1px solid white">
+                                <t t-if="o.pos_id.logo_position == 'top'">
+                                    <tr>
+                                            <td class="text-center">
+                                                <img t-att-src="image_data_uri(o.company_id.logo)" t-att-style="o.get_logo_style()"/>
+                                            </td>
+                                        
+                                        
+                                    </tr>
+                                </t>
+
+
                                 <tr>
-                                    <td>
-                                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 40px;" alt="Logo"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
+                                    <t t-if="o.pos_id.logo_position == 'left'">
+                                        <td style="width:50%" rowspan="7" class="text-center">
+                                                <img t-att-src="image_data_uri(o.company_id.logo)" t-att-style="o.get_logo_style()"/>
+                                        </td>
+                                    </t>
+                                    
+                                    <td t-att-style="o.get_company_data_style()" >
                                         <strong t-esc="o.getCompanyName()"/>
                                     </td>
+                                    <t t-if="o.pos_id.logo_position == 'right'">
+                                        <td rowspan="7" class="text-center">
+                                            <img t-att-src="image_data_uri(o.company_id.logo)" t-att-style="o.get_logo_style()"/>
+                                        </td>
+                                    </t>
+                                    <t t-else="else">
+                                        <td style="width:100px;" rowspan="7" > </td>
+                                    </t>
+                                    
+
                                 </tr>
+
+
+                                
                                 <tr>
-                                    <td>
-                                        <strong t-field="o.pos_id.branch_office_id.name" />
+                                    <td t-att-style="o.get_company_data_style()">
+                                        <strong t-field="o.pos_id.branch_office_id.name"/>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td t-att-style="o.get_company_data_style()">
                                         <strong>
                                             No.
                                             <t t-esc="o.pos_id.name"/>
@@ -63,23 +92,48 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td t-att-style="o.get_company_data_style()">
                                         <span t-esc="o.pos_id.address"/>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td t-att-style="o.get_company_data_style()">
                                         <span>
                                             Teléfono: <t t-esc="o.getPhone()"/>
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td t-att-style="o.get_company_data_style()">
                                         <span t-esc="o.getMunicipality()"/>
                                     </td>
                                 </tr>
+
                             </table>
+                        </td>
+                        <td style="padding-left:14px; width:35%;">
+                            <table style="border: 1px solid white">
+                                <tr>
+                                    <td style=" width: 150px;"><strong>NIT</strong></td>
+                                    <td><t t-esc="o.company_id.vat"/></td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td ><strong>FACTURA Nº</strong></td>
+                                    <td><t t-esc="o.getInvoiceNumber()"/></td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td ><strong  >CÓD. AUTORIZACIÓN</strong></td>
+                                    <td style="-ms-word-break: break-all; word-break: break-all;  word-break: break-word; -ms-hyphens: auto; -moz-hyphens: auto; -webkit-hyphens: auto; hyphens: auto; width: 180px;"><t t-esc="o.cuf"/></td>
+                                    
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </template>
 
         <template id="l10n_invoice_document">
@@ -130,14 +184,8 @@
                     <t t-elif="o.document_type_id.getCode() == 47">
                         <t t-call="l10n_bo_bolivian_invoice.l10n_bo_invoice_credit_debit_note_discount_template" t-lang="o.partner_id.lang"/>
                     </t>
-                    <t t-elif="o.document_type_id.getCode() == 48">
-                        <t t-call="l10n_bo_bolivian_invoice.l10n_bo_invoice_credit_debit_note_ice_template" t-lang="o.partner_id.lang"/>
-                    </t>
                     
-                    <!--
-                        <t t-call="l10n_bo_bolivian_invoice.l10n_bo_invoice_credit_debit_note_template" t-lang="o.partner_id.lang"/>
-                        ...
-                    -->
+                    
 
                 </div>
             </t>

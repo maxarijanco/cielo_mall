@@ -89,9 +89,28 @@ class L10nBoOperationService(models.Model):
         raise UserError(f'El metodo: {self.name} no tiene un servicio wsdl')
     
 
+    @api.model
+    def soap_service(self, METHOD, ENVIRONMENT_TYPE, SERVICE_TYPE = None, MODALITY_TYPE = None):
+        PARAMS = [
+                ('name','=',METHOD),
+                ('environment_type','=', ENVIRONMENT_TYPE)
+        ]
+        if SERVICE_TYPE:
+            PARAMS.append(('service_type','=', SERVICE_TYPE))
+        if MODALITY_TYPE:
+            PARAMS.append(('modality_type','=', MODALITY_TYPE))
+        
+        return self.search(PARAMS,limit=1)
+
+    def getMethod(self):
+        return self.name
 
 
-    def process_soap_siat(self, endpoint, token, params, method):
+    def process_soap_siat(self, token, params = {}):
+        WSDL = self.getWsdl()
+        _logger.info(f'WSDL: {WSDL}')
+        METHOD = self.getMethod()
+        
         headers = {
             "apikey": f"TokenApi {token}"
         }
@@ -99,9 +118,9 @@ class L10nBoOperationService(models.Model):
         session.headers.update(headers)
 
         try:
-            transport = Transport(session=session)
-            client = Client(wsdl=endpoint, transport=transport)
-            call_wsdl = getattr(client.service, method)
+            transport = Transport(session=session, timeout = 30)
+            client = Client(wsdl= WSDL, transport=transport)
+            call_wsdl = getattr(client.service, METHOD)
             soap_response = call_wsdl(**params)
             response = {'success': True, 'data': soap_response}
         except Fault as fault:
@@ -114,5 +133,6 @@ class L10nBoOperationService(models.Model):
             response = {'success': False, 'error': typeError}
         except ReadTimeout as timeOut:
             response = {'success': False, 'error': timeOut}
+        _logger.info(f'{METHOD}: {response}')
         return response
     

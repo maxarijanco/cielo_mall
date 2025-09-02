@@ -32,3 +32,10 @@ class UomUom(models.Model):
         if self.env.company.id != self.env.company.getGrandParent().id:
             return self.getProduct().getCode()
         raise UserError(f'La unidad de medida {self.name} no tiene una UDM del SIAT')
+
+    def getDescription(self):
+        if self.siat_udm_id:
+            return self.siat_udm_id.getDescription()
+        if self.env.company.id != self.env.company.getGrandParent().id:
+            return self.getProduct().getDescription()
+        raise UserError(f'La unidad de medida {self.name} no tiene una UDM del SIAT')

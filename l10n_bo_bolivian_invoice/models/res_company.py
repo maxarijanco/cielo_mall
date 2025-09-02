@@ -214,6 +214,13 @@ class ResCompany(models.Model):
             raise UserError('Defina el tipo de modalidad')
         return COMPANY_ID.l10n_bo_code_modality
     
+    def getModalityService(self):
+        MODALITY = self.getL10nBoCodeModality()
+        if  MODALITY == '1':
+            return 'ServicioFacturacionElectronica'
+        elif MODALITY == '2':
+            return 'ServicioFacturacionComputarizada'
+        
     def getDelegateToken(self):
         COMPANY_ID = self.getGrandParent()
         if not COMPANY_ID.l10n_bo_delegate_token:

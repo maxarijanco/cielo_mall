@@ -112,14 +112,6 @@ class AccountMove(models.Model):
         return res + [2]
     
 
-    def getServiceType(self):
-        if self.document_type_id.name.getCode() in [2]:
-            if self.company_id.getL10nBoCodeModality() == '1':
-                return 'ServicioFacturacionElectronica'
-            elif self.company_id.getL10nBoCodeModality() == '2':
-                return 'ServicioFacturacionComputarizada'
-        return super(AccountMove, self).getServiceType()
-    
     def getAmountTotal2(self, decimal = 2):
         amount = 0
         for line in self.invoice_line_ids:

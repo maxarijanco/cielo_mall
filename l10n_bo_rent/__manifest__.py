@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'Facturacion alquiler.',
+    'name': '(2) Facturacion alquiler.',
     'version': '17.0',
     'author' : 'Acoim Ltda.',
     'summary': 'Alquiler de bienes inmuebles propios.',
@@ -14,7 +14,8 @@
         'account',
         'l10n_bo', 
         'base_address_extended',
-        'l10n_bo_bolivian_invoice'
+        'l10n_bo_bolivian_invoice',
+        'l10n_bo_base'
     ],
     'category': 'Accounting',
     'data': [

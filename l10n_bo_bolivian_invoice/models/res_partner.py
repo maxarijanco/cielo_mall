@@ -108,7 +108,7 @@ class ResPartner(models.Model):
             record.enable_bo_edi = record.env.company.enable_bo_edi
     
 
-
+    # METODO A ELIMINAR
     def getCode(self):
         if not self.code:
             raise UserError('El cliente no tiene un codigo de cliente')
@@ -121,7 +121,7 @@ class ResPartner(models.Model):
         else:
             raise UserError(f'El cliente {self.name} no tiene un tipo de identificacion fiscal')
     
-    
+    # CAMPO A ELIMINAR
     vat = fields.Char(
         string='NIT/CI', 
         copy=False,
@@ -129,7 +129,7 @@ class ResPartner(models.Model):
     )
 
 
-    
+    # CAMPO A ELIMINAR
     reazon_social = fields.Char(
         string='Razón social',
         copy=False
@@ -156,7 +156,7 @@ class ResPartner(models.Model):
                 record.write({'code' : code})
         
     
-
+    # CAMPO A ELIMINAR
     code = fields.Char(
         string='Código',
         copy=False,
@@ -173,7 +173,7 @@ class ResPartner(models.Model):
             record.write({'display_name' : f"{record.name} {prefix}"})
     
     
-
+    # METODO A ELIMINAR
     def getNit(self):
         if self.vat:
             return self.vat
@@ -207,14 +207,14 @@ class ResPartner(models.Model):
         else:
             raise UserError('Establezca un numero de Teléfono para el contacto de la compañia')
         
-    
+    # CAMPO A ELIMINAR
     complement = fields.Char(
         string='Complemento',
         copy=False
     )
     
         
-
+    # METODO A ELIMINAR
     def getComplement(self):
         if self.complement:
             return self.complement

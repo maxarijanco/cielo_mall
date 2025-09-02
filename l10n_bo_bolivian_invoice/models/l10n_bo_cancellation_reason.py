@@ -123,7 +123,7 @@ class AccountMove(models.Model):
     def SendCancelInvoice(self):
         if self.move_type == 'out_invoice':
             SERVICE_TYPE = self.getServiceType()
-            MODALITY_TYPE = None
+            MODALITY_TYPE = self.getModalityType()
             #if self.document_type_id.name.getCode() in [1]:
             #        SERVICE_TYPE = 'ServicioFacturacionCompraVenta'
            # 
@@ -133,9 +133,9 @@ class AccountMove(models.Model):
             #    elif self.company_id.getL10nBoCodeModality() == '2':
             #        SERVICE_TYPE = 'ServicioFacturacionComputarizada'
                 
-            if self.document_type_id.name.getCode() in [3]:
-                    #SERVICE_TYPE = 'ServicioFacturacionElectronica'
-                    MODALITY_TYPE = self.company_id.getL10nBoCodeModality()
+            # if self.document_type_id.name.getCode() in [3]:
+            #         #SERVICE_TYPE = 'ServicioFacturacionElectronica'
+            #         MODALITY_TYPE = self.company_id.getL10nBoCodeModality()
                 
             WSDL_RESPONSE = self.soap_service(METHOD='anulacionFactura', SERVICE_TYPE= SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
         elif self.move_type == 'out_refund':
@@ -208,11 +208,8 @@ class AccountMove(models.Model):
 
     def anulacionFactura(self, WSDL_SERVICE):
         _name_field = 'SolicitudServicioAnulacionFactura'
-        method_name = 'anulacionFactura'
         if self.document_type_id.name.getCode() in [24,29, 47]:
             _name_field = 'SolicitudServicioAnulacionDocumentoAjuste'
-            method_name = 'anulacionDocumentoAjuste'
-        #raise UserError(_name_field)
         request_data = {
             _name_field: {
                 'codigoAmbiente': int(self.company_id.getL10nBoCodeEnvironment()),
@@ -234,14 +231,12 @@ class AccountMove(models.Model):
         WSDL = WSDL_SERVICE.getWsdl()
         _logger.info(f"URL: {WSDL}")
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, request_data, method_name)
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, request_data)
         return WSDL_RESPONSE
     
 
     def anulacionDocumentoAjuste(self, WSDL_SERVICE):
         _name_field = 'SolicitudServicioAnulacionDocumentoAjuste'
-        method_name = 'anulacionDocumentoAjuste'
-        #raise UserError(_name_field)
         request_data = {
             _name_field: {
                 'codigoAmbiente': int(self.company_id.getL10nBoCodeEnvironment()),
@@ -259,10 +254,8 @@ class AccountMove(models.Model):
                 'cuf': self.cuf
             }
         }
-
-        WSDL = WSDL_SERVICE.getWsdl()
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, request_data, method_name)
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, request_data)
         return WSDL_RESPONSE
     
     

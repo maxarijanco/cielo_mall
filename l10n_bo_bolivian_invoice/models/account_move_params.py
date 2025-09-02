@@ -38,18 +38,13 @@ class AccountMoveParams(models.Model):
     
     def recepcionFactura(self, WSDL_SERVICE):
         OBJECT = self.getReceptionARGS(METHOD = 'SolicitudServicioRecepcionFactura')
-        WSDL = WSDL_SERVICE.getWsdl()
-        _logger.info(f'WSDL: {WSDL}')
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'recepcionFactura')
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
         return WSDL_RESPONSE
 
 
     def recepcionDocumentoAjuste(self, WSDL_SERVICE):
         OBJECT = self.getReceptionARGS(METHOD = 'SolicitudServicioRecepcionDocumentoAjuste')
-        _logger.info(f"OBJETO: {OBJECT}")
-        WSDL = WSDL_SERVICE.getWsdl()
-        _logger.info(f'WSDL: {WSDL}')
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'recepcionDocumentoAjuste')
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
         return WSDL_RESPONSE

@@ -35,10 +35,13 @@
                 <xpath expr="//field[@name='discount']" position="before">
                     <field name="parent_state" column_invisible="True" />
                     <field name="move_type" column_invisible="True" />
-                    <field name="amount_discount" optional="hide" readonly="1"  />    
+                    <!-- <field name="amount_discount" optional="hide" readonly="1"  />     -->
+                    
+                    <field name="prorated_line_discount"  column_invisible="True" />
+                    
                 </xpath>
-                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='discount']" position="attributes">
-                    <attribute name="readonly">move_type == "out_invoice"</attribute>
+                <!-- <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='discount']" position="attributes">
+                    <attribute name="readonly">move_type == "out_invoice" and edi_bo_invoice</attribute>
                 </xpath>
                 <xpath expr="//field[@name='price_subtotal']" position="before">
                     <button 
@@ -47,7 +50,11 @@
                         icon="fa-percent"    
                         invisible="parent_state not in ['draft'] or move_type not in ['out_invoice','out_refund']"
                     />
-                </xpath>
+
+                    
+                    <field name="edi_bo_invoice" column_invisible="True" />
+                    
+                </xpath> -->
             </field>
         </record>
     </data>

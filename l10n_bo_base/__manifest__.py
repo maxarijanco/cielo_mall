@@ -12,7 +12,9 @@
         'contacts',
     ],
     'category': 'Accounting',
-    'data': [],
+    'data': [
+        'views/account_move.xml'
+    ],
     'installable': True,
     'application': False,
     'auto_install': False,

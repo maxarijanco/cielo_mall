@@ -47,10 +47,10 @@ class DemoInvoiceCancellationLineWizard(models.TransientModel):
             ]
             to_continue = False
             
-            if self.document_type.getCode() in [1,2,3,4,6,8,11,14,28]:
+            if self.document_type.getCode() in [1,2,3,4,6,8,11,13,14,16,17,28]:
                 PARAMS.append(('move_type','=','out_invoice'))
                 to_continue = True
-            elif self.document_type.getCode() in [24, 47]:
+            elif self.document_type.getCode() in [24, 47, 48]:
                 PARAMS.append(('move_type','=','out_refund'))
                 to_continue = True
             

@@ -119,13 +119,7 @@ class l10nBoCufd(models.Model):
     
 
     def soap_service(self, METHOD):
-        #raise UserError(self.pos_id.company_id.getL10nBoCodeEnvironment())
-        PARAMS = [
-            ('name','=',METHOD),
-            ('environment_type','=', self.pos_id.company_id.getL10nBoCodeEnvironment())
-        ]
-        _logger.info(f"{PARAMS}")
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].soap_service(METHOD, self.pos_id.company_id.getL10nBoCodeEnvironment(), SERVICE_TYPE='FacturacionCodigos')
         if WSDL_SERVICE:
             WSDL_RESPONSE = getattr(self, METHOD)(WSDL_SERVICE)
             return WSDL_RESPONSE
@@ -158,17 +152,14 @@ class l10nBoCufd(models.Model):
             'codigoPuntoVenta'  : self.pos_id.getCode()
         }
         OBJECT = {'SolicitudCufd' : PARAMS}
-        WSDL =  WSDL_SERVICE.getWsdl()
-        _logger.info(f'WSDL: {WSDL}')
         TOKEN = self.pos_id.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'cufd')
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
         self.prepare_wsdl_reponse(WSDL_RESPONSE)
     
 
 
     
     def prepare_wsdl_reponse(self, response):
-        _logger.info(f"{response}")
         if response.get('success'):
             res_data = response.get('data', {})
             if res_data.codigo:

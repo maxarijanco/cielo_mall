@@ -376,7 +376,6 @@ class L10nBoPackageLine(models.Model):
     
     error = fields.Char(
         string='Error',
-        readonly=True 
     )
 
     
@@ -397,14 +396,20 @@ class L10nBoPackageLine(models.Model):
 
 
     def send_edi_documents(self):
-        if not self.transaccion:
-            SERVICE_TYPE = False
-            MODALITY_TYPE = False
-            if self.document_type_id.getCode() in [6, 8,14,17, 16]:
-                if self.company_id.getL10nBoCodeModality() == '1':
-                    SERVICE_TYPE = 'ServicioFacturacionElectronica'
-                elif self.company_id.getL10nBoCodeModality() == '2':
-                    SERVICE_TYPE = 'ServicioFacturacionComputarizada'
+        if True:
+            
+
+            SERVICE_TYPE = self.document_type_id.getServiceType()
+            MODALITY_TYPE = self.document_type_id.getModalityType()
+            
+            # if self.document_type_id.getCode() in [6, 8,14,17, 16]:
+            #     if self.company_id.getL10nBoCodeModality() == '1':
+            #         SERVICE_TYPE = 'ServicioFacturacionElectronica'
+            #     elif self.company_id.getL10nBoCodeModality() == '2':
+            #         SERVICE_TYPE = 'ServicioFacturacionComputarizada'
+            # elif self.document_type_id.getCode() == 1:
+            #         SERVICE_TYPE = 'ServicioFacturacionCompraVenta'
+
             
 
             res = self.soap_service(METHOD='recepcionPaqueteFactura', SERVICE_TYPE=SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
@@ -464,14 +469,18 @@ class L10nBoPackageLine(models.Model):
 
     def recepcionPaqueteFactura(self, WSDL_SERVICE):
         zip_file_bk = io.BytesIO()
+        item = 0
         with tarfile.open(fileobj=zip_file_bk, mode="w") as tar_file:
             for line in self.invoice_line_ids:
+                    line.file_number = item
+                    line.error = False
                     params_src = line.name.generate_xml().datas
                     params_src = base64.b64decode(params_src)
                     params_sio = io.BytesIO(params_src)
                     info = tarfile.TarInfo(name=line.name.name + '.xml')
                     info.size = len(params_src)
                     tar_file.addfile(tarinfo=info, fileobj=params_sio)
+                    item += 1
         zip_file_bk.seek(0)
         if zip_file_bk:
             _prepare_vals = self._prepare_params()
@@ -506,14 +515,23 @@ class L10nBoPackageLine(models.Model):
                             'reception_code' : data.codigoRecepcion,
                         }
                     )
+                            
 
-                    for line in self.invoice_line_ids:
-                        line.name.post_process_soap_siat(response)
-            
+                    if self.state_code in [904]:
+                        for msg in data.mensajesList:
+                            numeroArchivo = msg.numeroArchivo
+                            invoice_line_id = self.invoice_line_ids.filtered(lambda line : line.file_number == numeroArchivo and line.package_line_id.id == self.id)
+                            if invoice_line_id:
+                                invoice_line_id.error = msg.descripcion
+
+                    else:
+                        for line in self.invoice_line_ids:
+                            line.name.post_process_soap_siat(response)
+                
                     #self.package_id.write({'reception_code' : self.reception_code})
             error = ''
             for message in data.mensajesList:
-                error += " | " + message.descripcion
+                error += f" | mensaje: {message.descripcion}, archivo: {message.numeroArchivo}"
             self.write({'error' : error if error != '' else False})
         else:
             self.write({'error' : response.get('error')})
@@ -549,7 +567,7 @@ class L10nBoPackageLine(models.Model):
         return {'SolicitudServicioValidacionRecepcionPaquete': vals}
     
     def validacionRecepcionPaqueteFactura(self, WSDL_SERVICE):
-        if self.state_code == 901:
+        if True:
             _params_validate = self._params_validate()
             _logger.info('Parametros de validacion')
             _logger.info(f'{_params_validate}')
@@ -566,13 +584,17 @@ class L10nBoPackageLine(models.Model):
     def validate_documents(self):
         document_type = self.document_type_id
         if document_type:
-            SERVICE_TYPE = False
+            SERVICE_TYPE = self.document_type_id.getServiceType()
             MODALITY_TYPE = False
-            if document_type.getCode() in [6, 8,14,17,16]:
-                if self.company_id.getL10nBoCodeModality() == '1':
-                    SERVICE_TYPE = 'ServicioFacturacionElectronica'
-                elif self.company_id.getL10nBoCodeModality() == '2':
-                    SERVICE_TYPE = 'ServicioFacturacionComputarizada'
+            
+            # if document_type.getCode() in [6, 8,14,17,16]:
+            #     if self.company_id.getL10nBoCodeModality() == '1':
+            #         SERVICE_TYPE = 'ServicioFacturacionElectronica'
+            #     elif self.company_id.getL10nBoCodeModality() == '2':
+            #         SERVICE_TYPE = 'ServicioFacturacionComputarizada'
+            # elif self.document_type_id.getCode() == 1:
+            #         SERVICE_TYPE = 'ServicioFacturacionCompraVenta'
+            
             response = self.soap_service(METHOD='validacionRecepcionPaqueteFactura', SERVICE_TYPE=SERVICE_TYPE, MODALITY_TYPE=MODALITY_TYPE)
             _logger.info(response)
             if type(response) != list:
@@ -588,6 +610,17 @@ class L10nBoInvoiceLine(models.Model):
     _name = 'l10n.bo.package.invoice.line'
     _description = 'Lineas factura de paquete (BO)'
 
+    
+    file_number = fields.Integer(
+        string='Nro archivo',
+        copy=False, 
+        readonly=True 
+    )
+    
+    error = fields.Text(
+        string='Error',
+    )
+    
     
     name = fields.Many2one(
         string='Factura',

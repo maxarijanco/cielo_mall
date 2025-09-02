@@ -11,35 +11,38 @@ _logger = logging.getLogger(__name__)
 class L10nBoVerify(models.Model):
     _inherit = ['account.move']
     
-    def getVerificationVals(self):
-        return [
-            ('service_type','=',self.getServiceType()),
-            ('name','=','verificacionEstadoFactura'),
-            ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
-        ]
-        
+    def getVerificationMethod(self):
+        return self.document_type_id.name.getVerificationMethod()
+
     def verificacionEstadoFactura(self):
-        METHOD = 'verificacionEstadoFactura'
-        PARAMS = self.getVerificationVals()
+        METHOD = self.getVerificationMethod() #'verificacionEstadoFactura'
+        SERVICE_TYPE = self.getServiceType()
+        MODALITY_TYPE = self.getModalityType()
+        PARAMS = [
+                ('name','=',METHOD),
+                ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
+        ]
+        if SERVICE_TYPE:
+            PARAMS.append(('service_type','=', SERVICE_TYPE))
+        if MODALITY_TYPE:
+            PARAMS.append(('modality_type','=', MODALITY_TYPE))
+            
         
-        _logger.info(f"Parametros de busqueda del servicio {METHOD}:{PARAMS}")
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(
-            PARAMS,limit=1
-        )
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS)
 
         if WSDL_SERVICE:
             WSDL = WSDL_SERVICE.getWsdl()
             _logger.info(f'WSDL: {WSDL}')
             TOKEN = self.company_id.getDelegateToken()
             OBJECT = {
-                'SolicitudServicioVerificacionEstadoFactura':
+                self.env['l10n.bo.type.invoice'].getObjectName(METHOD): #'SolicitudServicioVerificacionEstadoFactura':
                 {
                     'codigoAmbiente': int(self.company_id.getL10nBoCodeEnvironment()),
                     'codigoPuntoVenta': int(self.pos_id.getCode()),
                     'codigoSistema': self.company_id.getL10nBoCodeSystem(),
                     'codigoSucursal': self.pos_id.branch_office_id.getCode(),
                     'nit': self.company_id.getNit(),
-                    'codigoDocumentoSector': self.document_type_id.getCode(),
+                    'codigoDocumentoSector': self.getDocumentSector(),
                     'codigoEmision': 1,
                     'codigoModalidad': int(self.company_id.getL10nBoCodeModality()),
                     'cufd': self.pos_id.getCufd(True),
@@ -49,7 +52,7 @@ class L10nBoVerify(models.Model):
                 }
             }
             _logger.info(f"PARAMETROS: {OBJECT}")
-            response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT,  METHOD)
+            response = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
             _logger.info(f"RESPUESTA: {response}")
             if response.get('success', False):
                 res_data = response.get('data')

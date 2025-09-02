@@ -20,7 +20,7 @@ from . import res_currency
 from . import l10n_bo_global_discount
 from . import account_move_1
 from . import account_move_params
-from . import account_move_1_params, account_move_24_params, account_move_47_params, account_move_48_params
+from . import account_move_1_params, account_move_24_params, account_move_47_params
 from . import l10n_bo_message_code
 from . import l10n_bo_cancellation_reason
 from . import report_paperformat
@@ -28,6 +28,5 @@ from . import significant_event
 from . import l10n_bo_package
 from . import l10n_bo_reversion
 from . import l10n_bo_cafc
-from . import account_tax
 from . import l10n_bo_verify
 from . import validate_account_move

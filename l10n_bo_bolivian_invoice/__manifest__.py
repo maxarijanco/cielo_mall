@@ -15,6 +15,7 @@
         'l10n_bo', 
         'base_address_extended',
         'l10n_bo_base',
+        'account_fix_discount'
     ],
     'category': 'Accounting',
     'demo': [],
@@ -50,7 +51,6 @@
         'reports/purchase_sale_roll.xml',
         'reports/credit_debit_note.xml',
         'reports/credit_debit_note_discount.xml',
-        'reports/credit_debit_note_ice.xml',
         'reports/ir_actions_report.xml',
         
         
@@ -99,6 +99,7 @@
     'application': True,
     'auto_install': False,
     'pre_init_hook': '',
+    'post_init_hook': '_post_init',
     'assets': {},
     'license': 'OPL-1',
     'website': 'https://www.acoim.com/',

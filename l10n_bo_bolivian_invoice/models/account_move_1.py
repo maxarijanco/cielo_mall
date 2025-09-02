@@ -31,7 +31,6 @@ _logger = logging.getLogger(__name__)
 
 
 
-
 class AccountMove1(models.Model):
     _inherit = ['account.move']
 
@@ -57,11 +56,11 @@ class AccountMove1(models.Model):
         self.write(
             {
                 'url' : self.getUrl() + f'?nit={self.company_id.getNit()}&cuf={self.cuf}&numero={self.getInvoiceNumber()}&t={self.pos_id.paper_format_type}',
-                #'invoice_date_edi' : self.get_datetime(),
             }
         )
         if self.pos_id.emision_id.getCode() == 1: 
-            self.write({'invoice_date_edi' : self.get_datetime(),})
+            pass
+            #self.write({'invoice_date_edi' : self.get_datetime(),})
         if self.is_card:
             self.write({'card' : self.getCard()})
         if self.email_send:
@@ -158,8 +157,8 @@ class AccountMove1(models.Model):
             #record.checkConection()
             if pos_code_state != record.pos_id.getEmisionCode():
                 invoice_post_outline = True
-            if record.document_type_id.name.getCode() in [24, 47, 48] and record.pos_id.emision_code == 2:
-                raise UserError('SERVICIO NO DISPONIBLE: Para la modalidad 2 y/o sector 24, emisiones fuera de linea')
+            if record.invoice_type_code == 3 and record.pos_id.emision_code == 2:
+                raise UserError('SERVICIO NO DISPONIBLE')
             
             record.check_partner_id()
             record.check_payment_type()
@@ -216,6 +215,7 @@ class AccountMove1(models.Model):
             _cuf = record.generateCuf()
             record.write({'cuf' : _cuf})
             record.write({'edi_str' : record.str_edi_format()})
+            _logger.info(f'EDI STR: {record.edi_str}')
             edi_str = record.edi_str
             if record.edi_str in [None, False, '']:
                 raise UserError(f'No tiene disponible una implementacion para el documento: {record.document_type_id.name.name}')
@@ -225,7 +225,6 @@ class AccountMove1(models.Model):
                 record.sign_edi_str()
                 edi_str = record.signed_edi_str
             
-            _logger.info(f'EDI STR: {edi_str}')
             record.validate_xml(edi_str, record.get_xsd_path())
                 
             if record.pos_id.getEmisionCode() == 1:
@@ -264,8 +263,9 @@ class AccountMove1(models.Model):
     def prorate_prepare(self):
         if self.document_type_id.name.invoice_type_id.getCode() in [1]:
             amount_subtotal = self.getAmountSubTotal()
+            amount_discount = self.getAmountDiscount()
             for line_id in self.invoice_line_ids:
-                line_id.apportionment(amount_subtotal)
+                line_id.apportionment(amount_subtotal, amount_discount)
                 
 
     def sign_edi_str(self):
@@ -318,24 +318,37 @@ class AccountMove1(models.Model):
         WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS)
         
         if WSDL_SERVICE:
-            #raise UserError(WSDL_SERVICE.getWsdl())
+            #raise UserError(f'{PARAMS}')
             return getattr(self, f"{METHOD}")(WSDL_SERVICE)
         raise UserError(f'Servicio: {METHOD} no encontrado')
 
     def getAvailableDocument(self) -> list:
-        return [1,17]
+        return [
+            1, # COMPRA VENTA
+            24,# NOTA DE CREDITO DEBITO
+            47 # NOTA DE CREDITO DEBITO DESCUENTOS
+        ]
+    
+
+    def getReceptionMethod(self):
+        return self.document_type_id.name.getReceptionMethod()
     
     def getServiceType(self):
-        SERVICE_TYPE = None
-        if self.document_type_id.name.getCode() in [1]: 
-            SERVICE_TYPE = 'ServicioFacturacionCompraVenta'
-        if self.document_type_id.name.getCode() in [17]:
-            if self.company_id.getL10nBoCodeModality() == '1':
-                SERVICE_TYPE = 'ServicioFacturacionElectronica'
-            elif self.company_id.getL10nBoCodeModality() == '2':
-                SERVICE_TYPE = 'ServicioFacturacionComputarizada'
+        SERVICE_TYPE = self.document_type_id.name.getServiceType()
+        # if self.document_type_id.name.getCode() in [1]: 
+        #     SERVICE_TYPE = 'ServicioFacturacionCompraVenta'
+        # if self.document_type_id.name.getCode() in [17]:
+        #     if self.company_id.getL10nBoCodeModality() == '1':
+        #         SERVICE_TYPE = 'ServicioFacturacionElectronica'
+        #     elif self.company_id.getL10nBoCodeModality() == '2':
+        #         SERVICE_TYPE = 'ServicioFacturacionComputarizada'
         #raise UserError(SERVICE_TYPE)
         return SERVICE_TYPE
+    
+    def getModalityType(self):
+        return self.document_type_id.name.getModalityType()
+    
+    
     
 
     def send_invoice(self):
@@ -344,18 +357,20 @@ class AccountMove1(models.Model):
             WSDL_RESPONSE = False
             if self.document_type_id.name.getCode() in self.getAvailableDocument(): 
                 SERVICE_TYPE = self.getServiceType()
-                MODALITY_TYPE = None
+                MODALITY_TYPE = self.getModalityType()
+                METHOD = self.getReceptionMethod()
                 
                 # if self.document_type_id.name.getCode() in [3]:
                 #     #SERVICE_TYPE = 'ServicioFacturacionElectronica'
                 #     MODALITY_TYPE = self.company_id.getL10nBoCodeModality()
                 
-                WSDL_RESPONSE = self.soap_service(METHOD='recepcionFactura', SERVICE_TYPE=SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
-            elif self.document_type_id.name.getCode() in [24, 47, 48]: # /|\ ADD MORE DOCUMENTS
-                WSDL_RESPONSE = self.soap_service(METHOD='recepcionDocumentoAjuste')
+                # if self.document_type_id.name.getCode() in [24, 47, 48]: # /|\ ADD MORE DOCUMENTS
+                #     WSDL_RESPONSE = self.soap_service(METHOD='recepcionDocumentoAjuste', SERVICE_TYPE=SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
+                # else:
+                WSDL_RESPONSE = self.soap_service(METHOD=METHOD, SERVICE_TYPE=SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
                 
+                    
             if WSDL_RESPONSE:
-                _logger.info(WSDL_RESPONSE)
                 self.post_process_soap_siat(WSDL_RESPONSE)
             
 
@@ -512,60 +527,38 @@ class AccountMove1(models.Model):
 
             elif self.document_type_id.getCode() == 47:
                 _str = self.credit_debit_note_discount_format_computerized()
-            elif self.document_type_id.getCode() == 48:
-                _str = self.credit_debit_note_ice_format_computerized()
+            # elif self.document_type_id.getCode() == 48:
+            #     _str = self.credit_debit_note_ice_format_computerized()
             
             #others...
         return _str
     
 
+    def getAmountEffective(self):
+        return self.roundingUp(self.getAmountOnIva() * 0.13, self.decimalbo())
     # CALCS
     def amountCurrency(self):
         amount_total = self.getAmountTotal() / self.currency_id.getExchangeRate() #self.tax_totals.get('amount_total', 0.00)# / self.currency_id.getExchangeRate()
-        #raise UserError(f"{amount_total} - {self.amount_giftcard}")
-        #if self.document_type_id.getCode() == 3:
-            #raise UserError(amount_total)
-        #    pass#amount_total *= self.currency_id.getExchangeRate()#self.getAmountCostNationals()#self.getTotalNationalExpenseFob() + self.getAmountCostInternationals()
-        
-        #raise UserError(f'Moneda: {amount_total}')
         return self.roundingUp(amount_total, self.decimalbo()) #round(amount_total - self.amount_giftcard,2)
     
-    
-    # METODO A ELIMINAR
-    #def getAmountTotalExchageRate(self):
-    #    amount_total = (self.amountCurrency() )
-    #    return round(amount_total ,2)
-    
-    def getAmountTotal(self) -> float :
-        if self.tax_totals:
-            amount_total = 0
-            for line in self.invoice_line_ids:
-                if line.display_type == 'product' and not line.product_id.gif_product:
-                    amount_total += line.getSubTotal()
-                    #if self.document_type_id.name.getCode() in [14]:
-                    #    amount_total += line.getSpecificIce() + line.getPercentageIce()
-            amount_total -= self.getAmountDiscount()
-            
-            #if self.document_type_id.getCode() in [4]:
-            #    amount_total *= self.currency_id.getExchangeRate()
-            # if self.document_type_id.getCode() in [47]:
-            #     amount_total -= self.getAmountTotalProrated()
-            
-            # _logger.info(f"Monto total: {amount_total}")
+    def AmountProrated(self):
+        return self.roundingUp(sum([line.get_prorated_line_discount() for line in self.get_invoice_lines()]), self.decimalbo())
+        
+    def getAmountSubTotal(self):
+        amount_subtotal = sum([line.getSubTotal() for line in self.get_invoice_lines()])
+        return self.roundingUp(amount_subtotal, self.decimalbo())
+        
 
-            # if self.document_type_id.name.getCode() in [14]:
-            #     amount_total = self.roundingUp(amount_total, 2)
-            amount_total = self.roundingUp(amount_total, self.decimalbo())
-            return  amount_total
-        return 0
+    def getAmountTotal(self) -> float :
+        amount_total = self.getAmountSubTotal() #sum([line.getSubTotal() for line in self.get_invoice_lines()])
+        amount_total -= self.getAmountDiscount()
+        amount_total -= self.AmountProrated()
+        return self.roundingUp(amount_total, self.decimalbo())
+        
     
     def getAmountOnIva(self) -> float:
         if self.document_type_id.name.invoice_type_id.getCode() != 2: # SOLO DOCUMENTOS DIFERENTES A "SIN CREDITO FISCAL"
-            amount = round(self.getAmountTotal() - self.getAmountGiftCard(),2)
-            #_logger.info(f"Antes de procesar: {amount}")
-            #if self.document_type_id.getCode() in [14]:
-            #    amount = round(amount - self.getAmountSpecificIce(5) - self.getAmountPercentageIce(), 2)
-            #raise UserError(f"ANTES 2 {amount}")
+            amount = self.roundingUp(self.getAmountTotal() - self.getAmountGiftCard(),2)
             return amount
         return 0
     
@@ -587,10 +580,10 @@ class AccountMove1(models.Model):
                 if self.document_type_id.getCode() == 1:
                     xsd_name = 'facturaComputarizadaCompraVenta.xsd'
                 # ... AD MORE XSD PATHS
-                if self.document_type_id.getCode() == 17:
-                    xsd_name = 'facturaComputarizadaHospitalClinica.xsd'
-                if self.document_type_id.getCode() == 48:
-                    xsd_name = 'notaComputarizadaCreditoDebitoIce.xsd'
+                #if self.document_type_id.getCode() == 17:
+                #    xsd_name = 'facturaComputarizadaHospitalClinica.xsd'
+                #if self.document_type_id.getCode() == 48:
+                #    xsd_name = 'notaComputarizadaCreditoDebitoIce.xsd'
                 
         if xsd_name:
             return os.path.join(os.path.dirname(__file__), f'../templates/{xsd_name}')
@@ -692,6 +685,7 @@ class AccountMove1(models.Model):
         #return (value * factor + 0.5) // 1 / factor
         return float(Decimal(str(value)).quantize(Decimal('1.' + '0' * precision), rounding=ROUND_HALF_UP))
     
+    
 
     def getIdentificationCode(self):
         return self.partner_id.getIdentificationCode()
@@ -699,5 +693,35 @@ class AccountMove1(models.Model):
 
     def get_logo_style(self):
         """Retorna el estilo CSS para el logo basado en el tamaño definido."""
-        size = self.pos_id.logo_size or 100
-        return f'width: {size}%; height: auto;'
+        size = 150 # px
+        if self.pos_id.logo_size:
+            size += ((int(self.pos_id.logo_size))/100)*size
+        return f'width: {size}px; height: auto;'
+    
+    def get_company_data_style(self):
+        """Retorna el estilo CSS para el logo basado en el tamaño definido."""
+        align = 'center'
+        width = 65
+        if self.pos_id.logo_position in ['left', 'right']:
+            #align = 'left'
+            width = 55
+            
+
+        return f'text-align: {align}; width: {width}%;'
+    
+
+
+    def get_invoice_lines(self): # Lineas de factura
+        invoice_line_ids = self.invoice_line_ids.filtered( 
+            lambda line : \
+                line.display_type == 'product' and \
+                not line.product_id.gif_product
+        )
+        return invoice_line_ids
+    
+
+    def getItemLine(self, ITEM):
+        for line in self.get_invoice_lines():
+            if line.getItemNumber() == ITEM:
+                return line
+        return False

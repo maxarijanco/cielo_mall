@@ -43,21 +43,20 @@ class AccountMoveParams(models.Model):
         cabecera += """</cabecera>"""
         
         detalle  = """"""
-        for line in self.invoice_line_ids:
-            if line.display_type == 'product' and not line.product_id.gif_product:
-                detalle  += """<detalle>"""
-                detalle += f"""<actividadEconomica>{line.product_id.getAe()}</actividadEconomica>"""
-                detalle += f"""<codigoProductoSin>{line.product_id.getServiceCode()}</codigoProductoSin>"""
-                detalle += f"""<codigoProducto>{line.product_id.getCode(to_xml =True)}</codigoProducto>"""
-                detalle += f"""<descripcion>{line.getDescription(to_xml =True)}</descripcion>"""
-                detalle += f"""<cantidad>{round(line.quantity,2)}</cantidad>"""
-                detalle += f"""<unidadMedida>{line.product_uom_id.getCode()}</unidadMedida>"""
-                detalle += f"""<precioUnitario>{line.getPriceUnit()}</precioUnitario>"""
-                detalle += f"""<montoDescuento>{line.getAmountDiscount()}</montoDescuento>""" if line.getAmountDiscount() > 0 else """<montoDescuento xsi:nil="true"/>"""
-                detalle += f"""<subTotal>{line.getSubTotal()}</subTotal>"""
-                detalle += f"""<numeroSerie xsi:nil="true"/>"""
-                detalle += f"""<numeroImei xsi:nil="true"/>"""
-                detalle += """</detalle>"""
+        for line in self.get_invoice_lines():
+            detalle  += """<detalle>"""
+            detalle += f"""<actividadEconomica>{line.product_id.getAe()}</actividadEconomica>"""
+            detalle += f"""<codigoProductoSin>{line.product_id.getServiceCode()}</codigoProductoSin>"""
+            detalle += f"""<codigoProducto>{line.product_id.getCode(to_xml =True)}</codigoProducto>"""
+            detalle += f"""<descripcion>{line.getDescription(to_xml =True)}</descripcion>"""
+            detalle += f"""<cantidad>{line.getQuantity()}</cantidad>"""
+            detalle += f"""<unidadMedida>{line.product_uom_id.getCode()}</unidadMedida>"""
+            detalle += f"""<precioUnitario>{line.getPriceUnit()}</precioUnitario>"""
+            detalle += f"""<montoDescuento>{line.getAmountDiscount()}</montoDescuento>""" if line.getAmountDiscount() > 0 else """<montoDescuento xsi:nil="true"/>"""
+            detalle += f"""<subTotal>{line.getSubTotal()}</subTotal>"""
+            detalle += f"""<numeroSerie xsi:nil="true"/>"""
+            detalle += f"""<numeroImei xsi:nil="true"/>"""
+            detalle += """</detalle>"""
             
         return cabecera + detalle
     
@@ -77,8 +76,8 @@ class AccountMoveParams(models.Model):
         _format += f"""</facturaElectronicaCompraVenta>"""
         return _format
     
-    def getNameReazonSocial(self, to_xml = False):
-        return self.partner_id.getNameReazonSocial(to_xml)
+    # def getNameReazonSocial(self, to_xml = False):
+    #     return self.partner_id.getNameReazonSocial(to_xml)
 
 
     def getCafc(self):
@@ -88,8 +87,8 @@ class AccountMoveParams(models.Model):
             cafc = self.cafc
         return  cafc  
     
-    def getPartnerNit(self):
-        return self.partner_id.getNit()
+    # def getPartnerNit(self):
+    #     return self.partner_id.getNit()
     
     def getPartnerComplement(self):
         return self.partner_id.getComplement()
@@ -119,8 +118,8 @@ class AccountMoveParams(models.Model):
     def getPhone(self):
         return self.branch_office_id.getPhone()
     
-    def getCompanyName(self, to_xml = False):
-        return escape(self.company_id.name) if to_xml else self.company_id.name
+    # def getCompanyName(self, to_xml = False):
+    #     return escape(self.company_id.name) if to_xml else self.company_id.name
     
     def getCufd(self):
         return self.pos_id.getCufd(actual = True)

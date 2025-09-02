@@ -1,10 +1,11 @@
-from odoo import api, models, fields
-from odoo.exceptions import UserError
+# -*- coding: utf-8 -*-
+
+
+from odoo import api, models
 
 class AccountTax(models.Model):
     _inherit = "account.tax"
 
-    ''''''
     @api.model
     def _convert_to_tax_base_line_dict(
         self,
@@ -42,13 +43,6 @@ class AccountTax(models.Model):
             handle_price_include=handle_price_include,
             extra_context=extra_context,
         )
-        if base_line and base_line._name == "account.move.line" and base_line.proportional_discount>0:
-            res["discount"] = base_line._get_discount_from_fixed_discount()
+        if base_line._name == "account.move.line":
+            res["discount"] = base_line.get_discount_percentage()
         return res
-
-    
-    ice_factor = fields.Float(
-        string='Factor ICE',
-        help='Factor por el sera estimada el calculo del impuesto para productos con ICE. Ej: 1 lt, 1000 uni',
-        copy=False
-    )

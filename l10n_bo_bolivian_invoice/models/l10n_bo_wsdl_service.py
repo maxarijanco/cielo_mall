@@ -104,33 +104,4 @@ class L10nBoWsdl(models.Model):
         L10N_BO_OPERACION_SERVICE = self.env['l10n.bo.operacion.service']
         self.get_wsdl_operations(L10N_BO_OPERACION_SERVICE,self.environment_type,self.wsdl,self.service_type)
 
-    def process_soap_siat(self, endpoint, token, params, method):
-        headers = {
-            "apikey": f"TokenApi {token}"
-        }
-        session = requests.Session()
-        session.headers.update(headers)
-
-        try:
-            transport = Transport(session=session)
-            client = Client(wsdl=endpoint, transport=transport)
-            call_wsdl = getattr(client.service, method)
-            soap_response = call_wsdl(**params)
-            response = {'success': True, 'data': soap_response}
-        except Fault as fault:
-            response = {'success': False, 'error': fault.message}
-        except ReqConnectionError as connectionError:
-            response = {'success': False, 'error': connectionError}
-        except HTTPError as httpError:
-            response = {'success': False, 'error': httpError}
-        except TypeError as typeError:
-            response = {'success': False, 'error': typeError}
-        except ReadTimeout as timeOut:
-            response = {'success': False, 'error': timeOut}
-        return response
-    
-
-
-
-
-
+   
