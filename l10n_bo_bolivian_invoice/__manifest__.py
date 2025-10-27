@@ -15,6 +15,7 @@
         'l10n_bo', 
         'base_address_extended',
         'l10n_bo_base',
+        'l10n_bo_toponyms',
         'account_fix_discount'
     ],
     'category': 'Accounting',
@@ -39,9 +40,6 @@
         #DATA
         'data/l10n_bo_wsdl_service.xml',
         'data/l10n_bo_catalog.xml',
-        'data/res.country.state.csv',
-        'data/res.city.csv',
-        'data/res.municipality.csv',
         
         #REPORTS
         'reports/paper_formats.xml',
@@ -88,6 +86,8 @@
 
         # VIEWS WIZARD
         'wizard/l10n_bo_pos_register_wizard.xml',
+        'wizard/wizard_cancellation_invoice.xml',
+        
         'wizard/demo_invoice_line_wizard.xml',
         'wizard/demo_invoice_wizard.xml',
         'wizard/demo_invoice_cancellation_line_wizard.xml',
@@ -102,7 +102,7 @@
     'post_init_hook': '_post_init',
     'assets': {},
     'license': 'OPL-1',
-    'website': 'https://www.acoim.com/',
+    'website': 'https://acoim.com/',
     'maintainer': 'Luis Fernando Hinojosa Flores',
     'contributors': ['Luis Fernando Hinojosa Flores <hinojosafloresluisfernando@gmail.com>']
 }

@@ -387,8 +387,8 @@ class L10nBoPos(models.Model):
     def update_cufd(self):
         company_ids = self.env['res.company'].sudo().search([('enable_bo_edi','=',True),('branch_office_id','!=',False)])
         for company_id in company_ids:
-            branch_office_id = self.with_company(company_id.id).env['l10n.bo.branch.office'].sudo().browse(company_id.branch_office_id.id)
-            if branch_office_id:
+            COMPANY = self.with_company(company_id.id).env['res.company'].sudo().browse(company_id.id)
+            for branch_office_id in COMPANY.branch_office_ids:
                 branch_office_id.cufd_massive_request()
 
     def getControlCode(self):
@@ -446,7 +446,7 @@ class L10nBoPos(models.Model):
         emision_id = self.env['l10n.bo.type.emision'].search([('codigoClasificador','=',1)], limit=1)
         
         if not massive:
-            if not self.verificarComunicacion():
+            if not self.soap_service(METHOD='verificarComunicacion'):
                 return self.showMessage( 'Error de sincronizacion', 'Sin coneccion con el SIAT' )
         if self.cuis_id:
             if emision_id:
@@ -523,6 +523,20 @@ class L10nBoPos(models.Model):
             }
         }
         pass
+
+
+    def action_wizard_cancellation_invoice(self):
+        return {
+            'name': 'Anulaciones manuales',
+            'type': 'ir.actions.act_window',
+            'res_model': 'wizard.cancellation.invoice',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_pos_id': self.id,
+                'default_branch_office_id': self.branch_office_id.id,
+            }
+        }
 
 
     

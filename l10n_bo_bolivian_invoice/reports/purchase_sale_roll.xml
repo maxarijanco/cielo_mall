@@ -53,11 +53,11 @@
                 
             </tr>
             <tbody>
-                        <t t-foreach="o.invoice_line_ids" t-as="line">
+                        <t t-foreach="o.get_invoice_lines()" t-as="line">
                             <t t-set="numeric_amount">
                                 <t t-esc="line.price_total" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
                             </t>
-                            <t t-if="line.display_type == 'product' and line.product_id.gif_product == False">                                
+                            <t >                                
                                 <tr> 
                                     <td> <b t-field="line.product_id.default_code"/> <b>-</b>  <b t-esc="line.getDescription()"/></td> 
                                 </tr>

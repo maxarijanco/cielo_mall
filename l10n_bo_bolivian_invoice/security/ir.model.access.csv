@@ -29,7 +29,6 @@ access_l10n_bo_type_currency,access_l10n_bo_type_currency,model_l10n_bo_type_cur
 access_l10n_bo_type_point_sale,access_l10n_bo_type_point_sale,model_l10n_bo_type_point_sale,,1,1,1,1
 access_l10n_bo_type_invoice,access_l10n_bo_type_invoice,model_l10n_bo_type_invoice,,1,1,1,1
 access_l10n_bo_type_unit_measurement,access_l10n_bo_type_unit_measurement,model_l10n_bo_type_unit_measurement,,1,1,1,1
-access_res_municipality,access_res_municipality,model_res_municipality,,1,1,1,1
 access_message_code,access_message_code,model_message_code,,1,1,1,1
 access_cancellation_reason,access_cancellation_reason,model_cancellation_reason,,1,1,1,1
 access_global_discount,access_global_discount,model_global_discount,,1,1,1,1
@@ -40,6 +39,8 @@ access_l10n_bo_package_line,access_l10n_bo_package_line,model_l10n_bo_package_li
 access_l10n_bo_package_invoice_line,access_l10n_bo_package_invoice_line,model_l10n_bo_package_invoice_line,,1,1,1,1
 access_l10n_bo_cafc,access_l10n_bo_cafc,model_l10n_bo_cafc,,1,1,1,1
 access_l10n_bo_pos_register_wizard,access_l10n_bo_pos_register_wizard,model_l10n_bo_pos_register_wizard,,1,1,1,1
+access_wizard_cancellation_invoice,access_wizard_cancellation_invoice,model_wizard_cancellation_invoice,,1,1,1,1
+
 
 access_demo_invoice_wizard,access_demo_invoice_wizard,model_demo_invoice_wizard,,1,1,1,1
 access_demo_invoice_line_wizard,access_demo_invoice_line_wizard,model_demo_invoice_line_wizard,,1,1,1,1

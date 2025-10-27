@@ -56,6 +56,7 @@
                     <button name="action_online" type="object" string="En linea" icon="fa-play-circle" invisible="emision_code ==1 or not emision_code"  />
 
                     <button name="action_virtual_invoices" type="object" string="DEMO FACTURAS" icon="fa-play-circle" invisible="environment_type != '2'"/>
+                    <button name="action_wizard_cancellation_invoice" type="object" string="Anulaciones manuales" icon="fa-play-circle"/>
                     
                     
                 </header>

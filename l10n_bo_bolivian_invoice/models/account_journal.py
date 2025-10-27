@@ -13,6 +13,12 @@ class AccountJournal(models.Model):
         copy=False,
         help='Activar diario para movimientos fiscales (BO)'   
     )
+
+    
+    send_email_to_partner = fields.Boolean(
+        string='Notificar por correo',
+    )
+    
     
     
     enable_bo_edi = fields.Boolean(

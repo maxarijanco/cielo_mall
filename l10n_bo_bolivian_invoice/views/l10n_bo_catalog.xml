@@ -164,6 +164,7 @@
         <field name="model">l10n.bo.legend.code</field>
         <field name="arch" type="xml">
             <tree editable="top" create="false" >
+                <field name="name" column_invisible='True' />
                 <field name="codigoActividad"/>
                 <field name="descripcionLeyenda"/>
             </tree>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="l10n_bo_prevalued_template">
+                        <t>
+            <div >
+            <!-- 2 PUNTOS MAS GRANDE QUE LOS OTROS DOCUMENTO EN LA FUENTE -->
+                <t t-call="l10n_bo_bolivian_invoice.logo_position_top" />
+
+                <div class="center" style="display: block; padding-top: 30px; ">
+                    <div><b style="font-size: 23px;">FACTURA</b></div>
+                    <div> <span style="font-size: 15px;">(Con Derecho a Crédito Fiscal)</span> </div>
+                </div>
+
+                <table style="width:1000px; border: 1px solid white; margin-top:10px; margin-bottom:10px; font-size:17px;">
+                    <tr>
+                        <td style="width:200px;" ><b>Fecha:</b></td>
+                        <td style="width:500px;" ><span t-esc="o.get_formatted_datetime()"/> <span t-field="o.meridies" /> </td>
+                        <td style="width:120px;" ><b class="text-right">NIT/CI/CEX:</b></td>
+                        <td><span t-esc="o.getPartnerNit()"/> <span t-if="o.getPartnerComplement()"> - <span t-esc="o.getPartnerComplement()"/> </span> </td>
+                    </tr>
+                    <tr>
+                        <td style="margin-right:10px; "><b>Nombre/Razón Social:</b></td>
+                        <td ><span t-esc="o.getNameReazonSocial()"/></td>
+                        <td><b>Cod. Cliente:</b></td>
+                        <td><span t-esc="o.getPartnerCode()"/></td>
+                    </tr>
+                </table>
+
+                <table style="width:100%; border: 1px solid black; font-size: 14px;">
+                        <tr style="border: 1px solid black; height: 60px; background-color: #f7f7f7;" >
+                            <th style="width:130px;  border: 1px solid black; text-align:center ">CÓDIGO PRODUCTO / SERVICIO</th>
+                            <th style="width:110px;  border: 1px solid black; text-align:center">CANTIDAD</th>
+                            <th style="width:100px;  border: 1px solid black; text-align:center">UNIDAD DE MEDIDA</th>
+                            <th style="width:240px;  border: 1px solid black; text-align:center">DESCRIPCIÓN</th>
+                            <th style="width:110px;  border: 1px solid black; text-align:center">PRECIO UNITARIO</th>
+                            <th style="width:120px;  border: 1px solid black; text-align:center">DESCUENTO</th>
+                            <th style="border: 1px solid black; text-align:center">SUBTOTAL</th>
+                        </tr>
+                    <tbody>
+                        <t t-foreach="o.get_invoice_lines()" t-as="line">
+                            <!-- <t t-set="numeric_amount">
+                                <t t-esc="line.getSubTotal()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
+                            </t> -->
+                            <tr> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.product_id.getCode()"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getQuantity()"/></td> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.product_uom_id.getDescription()"/></td> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.getDescription()"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getPriceUnit()"  /></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getAmountDiscount()" /></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getSubTotal()"/></td> 
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div class="clearfix">
+                    <div id="total">
+                        <table class="table table-sm" style="width:100%; border: 1px solid white; font-size: 13px;">
+                            <tr>
+                                <td rowspan="2" style="width:580px; vertical-align: middle;"><b>Son: <span t-esc="o.getBolivianLiteral()"/> Bolivianos</b></td>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;">TOTAL Bs</td>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountTotal()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><b>IMPORTE BASE CREDITO FISCAL Bs</b></td>
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"> <span t-esc="o.getAmountOnIva()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/> </td>
+                            </tr>
+                        </table>
+                            
+                    </div>
+                </div>
+                
+                <div class="clearfix">
+                    <div id="total">
+                        <table class="table table-sm" style="font-size: 13px; width:100%; border: 1px solid white; text-align: center;  margin-top:40px; page-break-before: auto; page-break-inside: avoid; page-break-after: auto;">
+                            <tr>
+                                <td>ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS, EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY</td>
+                                <td rowspan="4" style="width: 20%;">
+                                <img t-att-src="'data:image/png;base64,' + str(o.generate_qr())" width="120" height="120"/></td>
+                            </tr>
+                            <tr>
+                                <td><span t-field="o.legend_id.descripcionLeyenda"/></td>
+                            </tr>
+                            <tr>
+                                <td><span t-field="o.pos_id.emision_id.legend"/></td>
+                            </tr>
+                        </table>
+                    </div>  
+                </div>
+            </div>
+        </t>
+        
+    </template>
+</odoo>

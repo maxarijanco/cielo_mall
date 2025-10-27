@@ -36,18 +36,18 @@ class AccountMoveLine(models.Model):
             discount_fix_prorated = (self.line_reversed_id.get_discount_fix() * (self.quantity * self.price_unit)) / previous_amount_base
             _logger.info(f'Descuento fijo prorateado: {discount_fix_prorated}')
             
-            amount_subtotal = (self.quantity * self.price_unit) - discount_fix_prorated
+            #amount_subtotal = (self.quantity * self.price_unit) - discount_fix_prorated
 
-            discount_global_prorated = (self.line_reversed_id.prorated_line_discount * amount_subtotal) / (previous_amount_base - self.line_reversed_id.get_discount_fix())
+            discount_global_prorated = (self.line_reversed_id.prorated_line_discount * self.quantity) / self.line_reversed_id.quantity #(previous_amount_base - self.line_reversed_id.get_discount_fix())
             _logger.info(f'Descuento global prorateado: {discount_global_prorated}')
             
             self.prorated_line_discount = discount_global_prorated
             self.amount_discount = discount_fix_prorated + discount_global_prorated #(self.line_reversed_id.prorated_line_discount * self.amountBase() ) / self.line_reversed_id.amountBase()
 
     def get_prorated_line_discount(self):
-        amount = self.prorated_line_discount * self.currency_id.getExchangeRate()
-        # if self.move_type in ['out_refund'] or self.line_reversed_id:
-        #     amount = self.prorated_line_discount * self.currency_id.getExchangeRate()
+        amount = 0 #self.prorated_line_discount * self.currency_id.getExchangeRate()
+        if self.move_type in ['out_refund'] or self.line_reversed_id:
+            amount = self.prorated_line_discount * self.currency_id.getExchangeRate()
         return amount
     
     def decimalbo(self)->int:

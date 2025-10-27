@@ -36,9 +36,8 @@
                 
                 
                 <xpath expr="//field[@name='partner_shipping_id']" position="before">
-                    <field name="edi_bo_invoice" invisible="1" />
+                    <field name="edi_bo_invoice" invisible="0" />
                     <field name="many_pos" invisible="1" />
-                    <field name="nit_state" invisible="1" />
                     <field name="document_type_code" invisible="1" />
                     
                     <field name="emision_type_id" invisible='1' />
@@ -47,7 +46,6 @@
                     
                     
                     
-                    <field name="force_send" widget="boolean_toggle" invisible="not edi_bo_invoice" readonly="state != 'draft'"/>
                     <field name="meridies" invisible="1" />
                     
 
@@ -110,7 +108,7 @@
 
                 <xpath expr="//group[@id='header_right_group']/label" position="before">
                     
-                    <field name="invoice_date_edi"  invisible="move_type != 'out_invoice'" readonly="state != 'draft'" />
+                    <field name="invoice_date_edi"  invisible="move_type != 'out_invoice' or not edi_bo_invoice" readonly="state != 'draft'" />
                                         
                 </xpath>
 
@@ -132,7 +130,7 @@
                 <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='currency_id']" position="after">
                     <field name="edi_state" invisible="not edi_state or not edi_bo_invoice"/>
 
-                    <field name="emision_type_id" invisible="not edi_bo_invoice" />
+                    <field name="emision_type_id" invisible="not edi_bo_invoice" readonly='1' />
                 </xpath>
 
                 <xpath expr="//field[@name='invoice_incoterm_id']" position="attributes">
@@ -143,7 +141,7 @@
                 <xpath expr="//notebook" position="inside">
                     <page name="page_edi" string="Factura (BO)" invisible="not edi_bo_invoice" readonly="state != 'draft'" >
                         
-                        <group>
+                        <group invisible="not edi_bo_invoice">
                             
                             <field name="legend_id"  options="{'no_create': True,'no_open': True}" readonly="state != 'draft'" />
                             
@@ -153,14 +151,31 @@
                             <group string='Datos del cliente' >
                                 
                                 <field name="reazon_social" />
-                                <field name="nit_ci" />
-                                <field name="complement" invisible="not complement" />
+                                
+                                <span class="o_form_label o_td_label" name="label_ci_nit" >
+                                    <b>NIT/CI</b>
+                                </span>
+                                <div class="o_address_format" >
+                                            <field name="identification_type_id" class="o_address_street"  options="{'no_create': True, 'no_open': True}"  />
+                                            <field name="nit_ci" placeholder="NIT/CI" class="o_address_city" />
+                                            <field name="identification_code" invisible="1"/>
+                                            <field name="complement" class="o_address_state" placeholder="Complemento" invisible='identification_code != 1'/>
+                                            <field name="nit_state" class="o_address_zip" invisible='identification_code != 5'/>
+                                            <field name="force_send" widget="boolean_toggle" class="o_address_zip" invisible="not edi_bo_invoice" readonly="state != 'draft'"/>
+                                </div>
+                    
+                                
+                            </group>
+                            <group string='Factura'>
+                                
+                                <field name="invoice_number" />
+                                <field name="cuf"/>
+                                <field name="cafc"  invisible="not cafc"/>
+                                
                                 
                                 
                             </group>
-                            <group>
-                                
-                                <field name="invoice_number" readonly="1" />
+                            <group invisible="not edi_bo_invoice" string='Otra informacion'>
                                 <field name="url" widget="url" />
                                 <field name="transaccion" invisible="1" />
                                 
@@ -168,21 +183,14 @@
                                 <field name="invoice_type_id" />
                                 
                                 <field name="invoice_type_code" />
-                                
-                                
-                                
-                            </group>
-                            <group>
-                                <field name="cuf"  readonly="1"/>
                                 <field name="edi_str" invisible="1" />
                                 <field name="error"  invisible="not error or transaccion"/>
-                                <field name="cafc"  invisible="not cafc"/>
                                 <field name="economic_activity_id" readonly="1" invisible="not economic_activity_id"/>
                                 
                             </group>
                         </group>
-                        <separator string="Observaciones (BO)" colspan="4" />
-                        <field name="messagesList_ids">
+                        <separator invisible="not edi_bo_invoice" string="Observaciones (BO)" colspan="4" />
+                        <field invisible="not edi_bo_invoice" name="messagesList_ids">
                             <tree   create="false" >
                                 <field name="name"/>
                                 <field name="code"/>

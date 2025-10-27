@@ -12,7 +12,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <strong t-esc="o.company_id.name"/>
+                                        <strong t-esc="o.getCompanyName()"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -30,19 +30,19 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <span t-esc="o.pos_id.address"/>
+                                        <span t-esc="o.getAddress()"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <span>
-                                            Teléfono: <t t-esc="o.company_id.phone"/>
+                                            Teléfono: <t t-esc="o.getPhone()"/>
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <span t-field="o.company_id.municipality_id.name"/>
+                                        <span t-esc="o.getMunicipality()"/>
                                     </td>
                                 </tr>
                             </table>
@@ -54,7 +54,7 @@
                                 <strong>NIT</strong>
                             </div>
                             <div class="col-6  m-0 p-0 text-left">
-                                <t t-esc="o.company_id.vat"/>
+                                <t t-esc="o.company_id.getNit()"/>
                             </div>
                         </div>
                         <div class="row  m-0 p-0">
@@ -70,7 +70,7 @@
                                 <strong>CÓD. AUTORIZACIÓN</strong>
                             </div>
                             <div class="col-4  m-0 p-0 text-left">
-                                <t t-esc="o.cuf"/>
+                                <t t-esc="o.getCuf()"/>
                             </div>
                         </div>
                     </div>
@@ -86,13 +86,13 @@
                         <td><b>Fecha:</b></td>
                         <td class="text-left"><span t-esc="o.get_formatted_datetime()"/> <span t-field="o.meridies"/></td>    
                         <td style="text-align: right;"><b>NIT/CI/CEX:</b></td>
-                        <td style="text-aling:left; padding-left:15px;"><span t-field="o.partner_id.vat"/> <span t-if="o.partner_id.complement"> - <span t-field="o.partner_id.complement"/> </span></td>
+                        <td style="text-aling:left; padding-left:15px;"><span t-esc="o.getPartnerNit()"/> <span t-if="o.getPartnerComplement()"> - <span t-esc="o.getPartnerComplement()"/> </span></td>
                     </tr>
                     <tr>
                         <td><b>Nombre/Razón Social:</b></td>
-                        <td class="text-left"><span t-field="o.partner_id.name"/></td>
+                        <td class="text-left"><span t-esc="o.getNameReazonSocial()"/></td>
                         <td style="text-align: right;"><b>Cod. Cliente:</b></td>
-                        <td style="text-aling:left; padding-left:15px;"><span t-field="o.partner_id.code"/></td>
+                        <td style="text-aling:left; padding-left:15px;"><span t-esc="o.getPartnerCode()"/></td>
                     </tr>
 
                     <tr>
@@ -124,19 +124,16 @@
                             <th style="border: 1px solid black;">SUBTOTAL</th>
                         </tr>
                     <tbody>
-                        <t t-foreach="o.reversed_entry_id.invoice_line_ids" t-as="line">
-                            <t t-set="numeric_amount">
-                                <t t-esc="line.getSubTotal()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/>
-                            </t>
-                            <tr t-if="line.display_type == 'product' and line.product_id.gif_product == False" > 
+                        <t t-foreach="o.reversed_entry_id.get_invoice_lines()" t-as="line">
+                            <tr> 
                                 <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.getItemNumber()"/></td> 
-                                <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.product_id.default_code"/></td> 
-                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-field="line.quantity"/></td> 
-                                <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.product_uom_id.siat_udm_id.descripcion"/></td> 
-                                <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.name"/></td> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.product_id.getCode()"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getQuantity()"/></td> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.product_uom_id.getDescription()"/></td> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.getDescription()"/></td> 
                                 <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getPriceUnit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/></td> 
                                 <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getAmountDiscount()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/></td> 
-                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="numeric_amount"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getSubTotal()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/></td> 
                             </tr>
                         
                         </t>
@@ -183,17 +180,17 @@
                             <th style="border: 1px solid black;">SUBTOTAL</th>
                         </tr>
                     <tbody>
-                        <t t-foreach="o.invoice_line_ids" t-as="line">
-                        <tr t-if="line.display_type == 'product'and line.product_id.gif_product == False" > 
+                        <t t-foreach="o.get_invoice_lines()" t-as="line">
+                        <tr> 
                             <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.getItemNumber()"/></td> 
-                            <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.product_id.default_code"/></td> 
-                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-field="line.quantity"/></td> 
-                            <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.product_uom_id.siat_udm_id.descripcion"/></td> 
-                            <td style="padding-left:10px; border: 1px solid black;"><span t-field="line.name"/></td> 
-                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getPriceUnit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /></td> 
-                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getAmountDiscount()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}" /></td> 
-                            <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getSubTotal()"/></td> 
-                        </tr>
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.product_id.getCode()"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getQuantity()"/></td> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.product_uom_id.getDescription()"/></td> 
+                                <td style="padding-left:10px; border: 1px solid black;"><span t-esc="line.getDescription()"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getPriceUnit()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getAmountDiscount()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/></td> 
+                                <td style="text-align: right; padding-right:10px; border: 1px solid black;"><span t-esc="line.getSubTotal()" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 2}"/></td> 
+                            </tr>
                         
                         </t>
                     </tbody>

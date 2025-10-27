@@ -13,6 +13,7 @@
                             <field name="enable_bo_edi" invisible="1" />
                             <field name="adm_journal_bo_edi" invisible="1" />
                             <field name="bo_edi" widget="boolean_toggle" />
+                            <field name="send_email_to_partner" widget="boolean_toggle" />
                         </group>
                         <group>
                         </group>

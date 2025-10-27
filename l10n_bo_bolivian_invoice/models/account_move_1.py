@@ -544,8 +544,9 @@ class AccountMove1(models.Model):
     def AmountProrated(self):
         return self.roundingUp(sum([line.get_prorated_line_discount() for line in self.get_invoice_lines()]), self.decimalbo())
         
+
     def getAmountSubTotal(self):
-        amount_subtotal = sum([line.getSubTotal() for line in self.get_invoice_lines()])
+        amount_subtotal = sum([ self.roundingUp(line.getSubTotal(), self.decimalbo()) for line in self.get_invoice_lines()])
         return self.roundingUp(amount_subtotal, self.decimalbo())
         
 
@@ -643,9 +644,8 @@ class AccountMove1(models.Model):
 
     def get_enconomic_activities_in_invoice_line(self, mark_invoice = False)->dict:
         economic_activities = []
-        for line in self.invoice_line_ids:
-            if line.display_type == 'product' and not line.product_id.gif_product:
-                economic_activities.append(line.product_id.getAe())
+        for line in self.get_invoice_lines():
+            economic_activities.append(line.product_id.getAe())
         if economic_activities:
             economic_activities = set(economic_activities)
             economic_activities = list(economic_activities)
@@ -673,8 +673,7 @@ class AccountMove1(models.Model):
         for record in self:
             if record.move_type == 'out_invoice':
                 item = 1
-                for line in record.invoice_line_ids:
-                    if line.display_type == 'product' and not line.product_id.gif_product:
+                for line in record.get_invoice_lines():
                         line.write({'item_number':item})
                         item += 1
 
@@ -688,6 +687,8 @@ class AccountMove1(models.Model):
     
 
     def getIdentificationCode(self):
+        if self.identification_type_id:
+            return self.identification_type_id.getCode()
         return self.partner_id.getIdentificationCode()
     
 

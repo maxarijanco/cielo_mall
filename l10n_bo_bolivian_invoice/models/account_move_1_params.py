@@ -91,7 +91,9 @@ class AccountMoveParams(models.Model):
     #     return self.partner_id.getNit()
     
     def getPartnerComplement(self):
-        return self.partner_id.getComplement()
+        if self.identification_code == 1:
+            return self.complement or self.partner_id.getComplement()
+        return False
     
     def getPartnerCode(self):
         if self.partner_id.code: return self.partner_id.code

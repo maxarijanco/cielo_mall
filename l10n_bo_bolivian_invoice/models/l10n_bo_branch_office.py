@@ -144,7 +144,9 @@ class L10nBoBranchOffice(models.Model):
     def update_pos_from_siat(self):
         pos = self.pos_id
         if pos and pos.getCuis():
-            if self.soap_service('verificarComunicacion','FacturacionOperaciones'):
+            connection = self.soap_service(METHOD='verificarComunicacion')
+            if connection:
+            #if self.soap_service('verificarComunicacion','FacturacionOperaciones'):
                 res = self.soap_service('consultaPuntoVenta')
                 _logger.info(f"{res}")
                 self.createPosS(res)
@@ -171,10 +173,10 @@ class L10nBoBranchOffice(models.Model):
             'cuis': self.pos_id.getCuis(),
         }
         OBJECT = {'SolicitudConsultaPuntoVenta': PARAMS}
-        WSDL = WSDL_SERVICE.getWsdl()
-        _logger.info(f'WSDL: {WSDL}')
+        #WSDL = WSDL_SERVICE.getWsdl()
+        #_logger.info(f'WSDL: {WSDL}')
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'consultaPuntoVenta')
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
         return WSDL_RESPONSE
     
 
@@ -275,18 +277,23 @@ class L10nBoBranchOffice(models.Model):
 
 
     def soap_service(self, METHOD = None, SERVICE_TYPE = None):
-        PARAMS = [
-                ('name','=',METHOD),
-                ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
-        ]
-        if SERVICE_TYPE:
-            PARAMS.append(('service_type','=', SERVICE_TYPE))
-
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].soap_service(METHOD, self.company_id.getL10nBoCodeEnvironment())
         if WSDL_SERVICE:
-            WSDL_RESPONSE = getattr(self, METHOD)(WSDL_SERVICE)
-            return WSDL_RESPONSE
+            return getattr(self, METHOD)(WSDL_SERVICE)
         raise UserError(f'Servicio: {METHOD} no encontrado')
+    
+        # PARAMS = [
+        #         ('name','=',METHOD),
+        #         ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
+        # ]
+        # if SERVICE_TYPE:
+        #     PARAMS.append(('service_type','=', SERVICE_TYPE))
+
+        # WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+        # if WSDL_SERVICE:
+        #     WSDL_RESPONSE = getattr(self, METHOD)(WSDL_SERVICE)
+        #     return WSDL_RESPONSE
+        # raise UserError(f'Servicio: {METHOD} no encontrado')
     
     def pos_system_init(self, reload = False):
         pos_id = self.l10n_bo_pos_ids.filtered(lambda pos: pos.code == 0)[:1]
@@ -320,19 +327,26 @@ class L10nBoBranchOffice(models.Model):
         raise UserError(self.soap_service('verificarComunicacion','FacturacionOperaciones'))
     
     def verificarComunicacion(self, WSDL_SERVICE):
-        WSDL = WSDL_SERVICE.getWsdl()
-        TOKEN = self.company_id.l10n_bo_delegate_token
-        response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, {},  'verificarComunicacion')
-        _logger.info(f"{response}")
+        response = WSDL_SERVICE.process_soap_siat(token = self.company_id.getDelegateToken())
         if response.get('success', False):
             res_data = response.get('data')
             if res_data.transaccion:
-                for obs in res_data.mensajesList:
-                    if obs.codigo == 926:
-                        return True
-            return False
-        else:
-                return False
+                return True
+        return False
+
+        # WSDL = WSDL_SERVICE.getWsdl()
+        # TOKEN = self.company_id.l10n_bo_delegate_token
+        # response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, {},  'verificarComunicacion')
+        # _logger.info(f"{response}")
+        # if response.get('success', False):
+        #     res_data = response.get('data')
+        #     if res_data.transaccion:
+        #         for obs in res_data.mensajesList:
+        #             if obs.codigo == 926:
+        #                 return True
+        #     return False
+        # else:
+        #         return False
         
 
     def action_pos_register_wizard(self):

@@ -16,7 +16,7 @@
                         <td style="width:200px;" ><b>Fecha:</b></td>
                         <td style="width:500px;" ><span t-esc="o.get_formatted_datetime()"/> <span t-field="o.meridies" /> </td>
                         <td style="width:120px;" ><b class="text-right">NIT/CI/CEX:</b></td>
-                        <td><span t-esc="o.getPartnerNit()"/> <span t-if="o.partner_id.complement"> - <span t-field="o.partner_id.complement"/> </span> </td>
+                        <td><span t-esc="o.getPartnerNit()"/> <span t-if="o.getPartnerComplement()"> - <span t-esc="o.getPartnerComplement()"/> </span> </td>
                     </tr>
                     <tr>
                         <td style="margin-right:10px; "><b>Nombre/Razón Social:</b></td>

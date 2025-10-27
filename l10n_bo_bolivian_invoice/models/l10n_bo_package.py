@@ -244,20 +244,12 @@ class L10nBoPackage(models.Model):
     )
 
 
+    
     def soap_service(self, METHOD = None, SERVICE_TYPE = None, MODALITY_TYPE = None):
-        PARAMS = [
-                ('name','=',METHOD),
-                ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
-        ]
-        if SERVICE_TYPE:
-            PARAMS.append(('service_type','=', SERVICE_TYPE))
-        if MODALITY_TYPE:
-            PARAMS.append(('modality_type','=', MODALITY_TYPE))
-        
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].soap_service(METHOD = METHOD, ENVIRONMENT_TYPE = self.company_id.getL10nBoCodeEnvironment(), SERVICE_TYPE = SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
         if WSDL_SERVICE:
             return getattr(self, METHOD)(WSDL_SERVICE)
-        self.write({'error' : f'Servicio: {METHOD} no encontrado'})
+        raise UserError(f'Servicio: {METHOD} no encontrado')
     
     # def _params_validate(self):
     #     document_type = self.package_line_ids.filtered(lambda package:package.reception_code == self.reception_code)
@@ -421,21 +413,10 @@ class L10nBoPackageLine(models.Model):
         
     
     def soap_service(self, METHOD = None, SERVICE_TYPE = None, MODALITY_TYPE = None):
-        PARAMS = [
-                ('name','=',METHOD),
-                ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
-        ]
-        if SERVICE_TYPE:
-            PARAMS.append(('service_type','=', SERVICE_TYPE))
-        if MODALITY_TYPE:
-            PARAMS.append(('modality_type','=', MODALITY_TYPE))
-        
-
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].soap_service(METHOD = METHOD, ENVIRONMENT_TYPE = self.company_id.getL10nBoCodeEnvironment(), SERVICE_TYPE = SERVICE_TYPE, MODALITY_TYPE = MODALITY_TYPE)
         if WSDL_SERVICE:
             return getattr(self, METHOD)(WSDL_SERVICE)
-        self.write({'error' : f'Servicio: {METHOD} no encontrado'})
-    
+        raise UserError(f'Servicio: {METHOD} no encontrado')
     
     cafc = fields.Char(
         string='CAFC',
@@ -495,10 +476,8 @@ class L10nBoPackageLine(models.Model):
             _logger.info(f"Parametros de envio: {_prepare_vals}")
 
             OBJECT = _prepare_vals
-            WSDL = WSDL_SERVICE.getWsdl()
-            _logger.info(WSDL)
             TOKEN = self.company_id.getDelegateToken()
-            WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'recepcionPaqueteFactura')
+            WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
             return WSDL_RESPONSE
             
     def parse_response(self, response):
@@ -572,10 +551,8 @@ class L10nBoPackageLine(models.Model):
             _logger.info('Parametros de validacion')
             _logger.info(f'{_params_validate}')
             OBJECT = _params_validate
-            WSDL = WSDL_SERVICE.getWsdl()
-            _logger.info(f"WSDL: {WSDL}")
             TOKEN = self.company_id.getDelegateToken()
-            WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'validacionRecepcionPaqueteFactura')
+            WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
             return WSDL_RESPONSE
         
         return [self.showMessage('PAQUETES', 'Tiene paquetes que aun no an sido enviados')]

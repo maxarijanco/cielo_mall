@@ -138,19 +138,25 @@ class SignificantEvent(models.Model):
     
     
 
-    def soap_service(self, METHOD, SERVICE_TYPE = None):
-        PARAMS = [
-            ('name','=',METHOD),
-            ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
-        ]
-        if SERVICE_TYPE:
-            PARAMS.append(('service_type','=', SERVICE_TYPE))
-        _logger.info(f"{PARAMS}")
-        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+    def soap_service(self, METHOD):
+        WSDL_SERVICE = self.env['l10n.bo.operacion.service'].soap_service(METHOD, self.company_id.getL10nBoCodeEnvironment(), 'FacturacionOperaciones')
         if WSDL_SERVICE:
-            WSDL_RESPONSE = getattr(self, METHOD)(WSDL_SERVICE)
-            return WSDL_RESPONSE
-        self.write({'error' : f'Servicio: {METHOD} no encontrado'})
+            return getattr(self, METHOD)(WSDL_SERVICE)
+        raise UserError(f'Servicio: {METHOD} no encontrado')
+    
+    # def soap_service(self, METHOD, SERVICE_TYPE = None):
+    #     PARAMS = [
+    #         ('name','=',METHOD),
+    #         ('environment_type','=', self.company_id.getL10nBoCodeEnvironment())
+    #     ]
+    #     if SERVICE_TYPE:
+    #         PARAMS.append(('service_type','=', SERVICE_TYPE))
+    #     _logger.info(f"{PARAMS}")
+    #     WSDL_SERVICE = self.env['l10n.bo.operacion.service'].search(PARAMS,limit=1)
+    #     if WSDL_SERVICE:
+    #         WSDL_RESPONSE = getattr(self, METHOD)(WSDL_SERVICE)
+    #         return WSDL_RESPONSE
+    #     self.write({'error' : f'Servicio: {METHOD} no encontrado'})
 
     def getDatetimeInit(self):
         if self.date_init:
@@ -187,7 +193,7 @@ class SignificantEvent(models.Model):
         self.write({'messagesList': [(6,0,_message_ids)] if _message_ids else False})
 
     def stable_communication(self) -> bool:
-        WSDL_RESPONSE = self.soap_service('verificarComunicacion', 'FacturacionOperaciones')
+        WSDL_RESPONSE = self.soap_service('verificarComunicacion')
         if WSDL_RESPONSE.get('success', False):
             res_data = WSDL_RESPONSE.get('data')
             if res_data.transaccion:
@@ -199,11 +205,9 @@ class SignificantEvent(models.Model):
                 return False
 
     def verificarComunicacion(self, WSDL_SERVICE):
-        WSDL = WSDL_SERVICE.getWsdl()
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, {},  'verificarComunicacion')
-        _logger.info(f"{WSDL_RESPONSE}")
-        return WSDL_RESPONSE
+        return WSDL_SERVICE.process_soap_siat(TOKEN, {})
+        
         
     
 
@@ -248,10 +252,8 @@ class SignificantEvent(models.Model):
         }
         OBJECT = {'SolicitudEventoSignificativo' : PARAMS}
         _logger.info(f"Parametros de evento: {PARAMS}")
-        WSDL =  WSDL_SERVICE.getWsdl()
         TOKEN = self.company_id.getDelegateToken()
-        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'registroEventoSignificativo')
-        _logger.info(f"RESPUESTA REGISTO DE EVENTO SIGNIFICATIVO: {WSDL_RESPONSE}")
+        WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
         self.prepare_soap_response(WSDL_RESPONSE)
 
     def register_event(self, from_pos = False):

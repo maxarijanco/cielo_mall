@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="view_wizard_cancellation_invoice" model="ir.actions.act_window">
+            <field name="name">Anulacion manual de Facturas</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.cancellation.invoice</field>
+            <field name="view_mode">form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crea tu primer Facturas de pruebas.
+                </p>
+            </field>
+        </record>
+        <record id="view_wizard_cancellation_invoice_tree" model="ir.ui.view">
+            <field name="name">view_wizard_cancellation_invoice_tree</field>
+            <field name="model">wizard.cancellation.invoice</field>
+            <field name="arch" type="xml">
+                <form >
+                    <header>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="branch_office_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="pos_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="company_id" />
+                                
+                            </group>
+                            <group>
+                                
+                                <field name="reason_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="document_type_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="invoice_type_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="cuf" eval="True" />
+
+                                
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_done" string="Anular" type="object" class="btn-primary"/>
+                        <button name="action_cancel" string="Cancelar" type="object"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

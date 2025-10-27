@@ -20,23 +20,23 @@ class AccountMove(models.Model):
     
     edi_bo_invoice = fields.Boolean(
         string='Factura (BO)',
-        related='journal_id.bo_edi',
-        readonly=True,
-        store=True
+        #related='journal_id.bo_edi',
+        readonly=False,
     )
 
     # ------------------------------------------------------------------------------
 
     invoice_date_edi = fields.Datetime(
         string='Fecha y hora (BO)',
-        default=fields.Datetime.now,
+        #default=fields.Datetime.now,
         copy=False
     )
     
-    @api.constrains('invoice_date_edi')
+    @api.constrains('invoice_date_edi','edi_bo_invoice')
     def _check_invoice_date_edi(self):
         for record in self:
-            record.invoice_date = record.invoice_date_edi
+            if record.edi_bo_invoice:
+                record.invoice_date = record.invoice_date_edi
     
 
     # ------------------------------------------------------------------------------
@@ -85,10 +85,15 @@ class AccountMove(models.Model):
     @api.constrains('partner_id')
     def _check_l10n_bo_partner_id(self):
         for record in self:
-            record.reazon_social = self.partner_id.getNameReazonSocial() if self.partner_id else False
-            record.nit_ci = self.partner_id.getNit() if self.partner_id else False
-            record.complement = self.partner_id.getComplement() if self.partner_id else False
+            reazon_social, nit_ci, complement = False, False, False
+            if record.partner_id:
+                reazon_social = record.partner_id.getNameReazonSocial()
+                nit_ci = record.partner_id.getNit()
+                complement = record.partner_id.getComplement()
             
+            record.reazon_social =  reazon_social
+            record.nit_ci =  nit_ci
+            record.complement =  complement
             
     def getNameReazonSocial(self, to_xml = False):
         if to_xml:
@@ -141,7 +146,7 @@ class AccountMove(models.Model):
             record.invisible_for_move = record.move_type in record.invisible_for_moves() and record.edi_bo_invoice
     
     def invisible_for_moves(self):
-        return []
+        return ['out_invoice']
     
     
     def getCompanyName(self, to_xml = False):

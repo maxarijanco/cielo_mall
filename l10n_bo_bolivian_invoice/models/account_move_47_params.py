@@ -154,21 +154,21 @@ class AccountMove47Params(models.Model):
         parte_decimal = f' {parte_decimal}' if parte_decimal > 10 else f' 0{parte_decimal}'
         return num2words(parte_entera, lang='es') + parte_decimal +'/100'
 
-    def _post(self, soft=True):
-        for record in self:
-            record.item_number_assigned()
-        res = super(AccountMove47Params, self)._post(soft = soft)
-        return res
+    # def _post(self, soft=True):
+    #     for record in self:
+    #         record.item_number_assigned()
+    #     res = super(AccountMove47Params, self)._post(soft = soft)
+    #     return res
     
 
-    def item_number_assigned(self):
-        for record in self:
-            if record.move_type == 'out_invoice':
-                item = 1
-                for line in record.invoice_line_ids:
-                    if line.display_type == 'product' and not line.product_id.gif_product:
-                        line.write({'item_number':item})
-                        item += 1
+    # def item_number_assigned(self):
+    #     for record in self:
+    #         if record.move_type == 'out_invoice':
+    #             item = 1
+    #             for line in record.invoice_line_ids:
+    #                 if line.display_type == 'product' and not line.product_id.gif_product:
+    #                     line.write({'item_number':item})
+    #                     item += 1
 
 
     
@@ -178,7 +178,7 @@ class AccountMove47Params(models.Model):
             if self.pos_id:
                 #self.write({'document_type_id' : self.get_credit_debit_ice_id()}) 
                 self.invoice_line_ids.filtered(lambda line: line.display_type == 'product' and line.product_id and line.product_id.global_discount).unlink()
-                for line in self.invoice_line_ids:
+                for line in self.get_invoice_lines():
                     line_reversed = self.reversed_entry_id.getItemLine(line.getItemNumber())
                     line.line_reversed_id = line_reversed.id
 

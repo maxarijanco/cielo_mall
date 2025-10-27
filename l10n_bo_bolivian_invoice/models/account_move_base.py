@@ -19,11 +19,17 @@ class AccountMove(models.Model):
     
     edi_bo_invoice = fields.Boolean(
         string='Factura (BO)',
-        related='journal_id.bo_edi',
-        readonly=True,
-        store=True
+        #related='journal_id.bo_edi',
+        readonly=False,
     )
     
+    
+    @api.onchange('journal_id')
+    @api.constrains('journal_id')
+    def _check_l10n_bo_journal_id(self):
+        for record in self:
+            record.edi_bo_invoice = record.journal_id.bo_edi
+            record.email_send = record.journal_id.send_email_to_partner
     
     
     branch_office_id = fields.Many2one(
@@ -37,7 +43,7 @@ class AccountMove(models.Model):
     @api.model
     def create(self, values):
         account_move_id = super(AccountMove, self).create(values)
-        account_move_id.prepare_fields()
+        #account_move_id.prepare_fields()
         return account_move_id
     
 
@@ -69,8 +75,7 @@ class AccountMove(models.Model):
     @api.constrains('pos_id')
     def _check_pos_id(self):
         for record in self:
-            if record.pos_id:
-                record.emision_type_id = record.pos_id.emision_id.id if record.pos_id.emision_id else False
+            record.emision_type_id = record.pos_id.emision_id.id if record.pos_id and record.pos_id.emision_id else False
     
 
     
@@ -86,8 +91,28 @@ class AccountMove(models.Model):
         store=True    
     )
     
+    identification_type_id = fields.Many2one(
+        string='Tipo de identificación',
+        comodel_name='l10n.bo.type.document.identity',
+        copy=False
+    )
+
+    identification_code = fields.Integer(
+        string='Codigo de identificación',
+        related='identification_type_id.codigoClasificador',
+        readonly=True,
+    )
     
-    
+    @api.constrains('partner_id')
+    def _check_l10n_bo_partner_id(self):
+        for record in self:
+            indentification_type_id = record.identification_type_id.id if record.identification_type_id else False
+            if record.partner_id:
+                if not indentification_type_id:
+                    indentification_type_id = record.partner_id.identification_type_id.id if record.partner_id.identification_type_id else False
+            record.identification_type_id = indentification_type_id
+        super(AccountMove, self)._check_l10n_bo_partner_id()
+        
     many_pos = fields.Boolean(
         string='Muchas puntos de venta',
         compute='_compute_many_pos', 
@@ -116,17 +141,17 @@ class AccountMove(models.Model):
     
     invoice_date_edi = fields.Datetime(
         string='Fecha y hora (BO)',
-        default=fields.Datetime.now,
+        #default=fields.Datetime.now,
         copy=False
     )
     
     
-    # @api.constrains('invoice_date_edi')
-    # def _check_invoice_date_edi(self):
-    #     for record in self:
-    #         if record.edi_bo_invoice and record.move_type in ['out_invoice','out_refund']:
-    #             record.write({'invoice_date' : fields.Date.context_today(self)})
     
+    @api.onchange('invoice_date_edi')
+    def _onchange_invoice_date_edi(self):
+        if self.edi_bo_invoice and self.move_type in ['out_invoice','out_refund']:
+            self.invoice_date  = self.invoice_date_edi
+
     # REVISAR METODO
     def get_formatted_datetime(self):
         if self.invoice_date_edi:
@@ -352,16 +377,13 @@ class AccountMove(models.Model):
     
     email_send = fields.Boolean(
         string='Enviar correo',
-        default=True
+        default=False
     )
     
 
     
     nit_state = fields.Char(
         string='Estado del nit',
-        related='partner_id.nit_state',
-        readonly=True,
-        store=True
     )
     
     

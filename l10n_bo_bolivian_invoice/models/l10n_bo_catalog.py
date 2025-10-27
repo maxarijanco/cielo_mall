@@ -141,9 +141,9 @@ class CatalogRequest(models.Model):
             PARAMS,limit=1
         )
         if WSDL_SERVICE:
-            WSDL = WSDL_SERVICE.getWsdl()
+            #WSDL = WSDL_SERVICE.getWsdl()
             TOKEN = company_id.getDelegateToken()
-            response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, {},  METHOD)
+            response = WSDL_SERVICE.process_soap_siat(TOKEN, {})
             _logger.info(f"{response}")
             if response.get('success', False):
                 res_data = response.get('data')
@@ -308,12 +308,12 @@ class L10nBoRequestCatalogStatus(models.Model):
             ],limit=1)
         if WSDL_SERVICE:
 
-            WSDL = WSDL_SERVICE.getWsdl()
-            _logger.info(f'WSDL: {WSDL}')
+            #WSDL = WSDL_SERVICE.getWsdl()
+            #_logger.info(f'WSDL: {WSDL}')
             TOKEN = company_id.getDelegateToken()
             PARAMS = self._prepare_params_soap(pos_id)
-            _logger.info(f'PARAMETROS: {PARAMS}')
-            response = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, PARAMS, self.catalog_id.code)
+            #_logger.info(f'PARAMETROS: {PARAMS}')
+            response = WSDL_SERVICE.process_soap_siat(TOKEN, PARAMS)
             
             _logger.info(f'{self.catalog_id.code}')
             

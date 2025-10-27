@@ -30,52 +30,6 @@ class ResCountry(models.Model):
     
 
 
-class ResCountryState(models.Model):    
-    
-    _inherit = ['res.country.state']
-    abbreviation = fields.Char(
-        string='Abreviatura',
-        copy=False
-    )
-    
-    
-
-class ResCity(models.Model):
-    _inherit = ['res.city']
-    code = fields.Char(
-        string='Codigo INE',
-        copy=False
-    )
-
-class ResMunicipality(models.Model):
-    _name = 'res.municipality'
-    _description = 'Municipalidades de Bolivia'
-    
-    name = fields.Char(
-        string='Nombre',
-        copy=False
-    )
-
-    
-    city_id = fields.Many2one(
-        string='Provincia',
-        comodel_name='res.city',
-        copy=False
-    )
-    
-    
-    code = fields.Char(
-        string='Codigo INE',
-        copy=False
-    )
-
-    
-    department_id = fields.Many2one(
-        string='Departamento',
-        comodel_name='res.country.state',
-        copy=False
-    )
-    
 
 class ResPartner(models.Model):
     _inherit = ['res.partner']
@@ -224,7 +178,7 @@ class ResPartner(models.Model):
     nit_state = fields.Char(
         string='Estado del NIT',
         default='Por consultar',
-        readonly=True 
+        readonly=False
     )
     
         
@@ -249,10 +203,11 @@ class ResPartner(models.Model):
     @api.onchange('vat', 'identification_code')
     @api.constrains('vat', 'identification_code')
     def _onchange_vat_identification_code(self):
-        for record in self:
-            if record.vat and record.identification_code == 5:
-                record.l10n_bo_validate_nit()
-            
+        if len(self) == 1:
+            for record in self:
+                if record.vat and record.identification_code == 5:
+                    record.l10n_bo_validate_nit()
+                
 
     def prepare_process_reponse(self, res):
         if res.get('success'):
@@ -284,9 +239,9 @@ class ResPartner(models.Model):
         _cuis = self.env['l10n.bo.pos'].search([('code','=',0),('company_id','=',self.env.company.id)]).getCuis()
         if _cuis:
             OBJECT = self._get_params_verify_nit(_branch,_cuis)
-            WSDL = WSDL_SERVICE.getWsdl()
+            #WSDL = WSDL_SERVICE.getWsdl()
             TOKEN = self.env.company.getDelegateToken()
-            WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(WSDL, TOKEN, OBJECT, 'verificarNit')
+            WSDL_RESPONSE = WSDL_SERVICE.process_soap_siat(TOKEN, OBJECT)
             return WSDL_RESPONSE
         return {'success' : False}
     
